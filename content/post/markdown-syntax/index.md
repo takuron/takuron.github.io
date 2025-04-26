@@ -3,7 +3,6 @@ title: Markdown Syntax Guide
 slug: syntax-guide
 date: 1970-01-01 00:00:00+0000
 description: 这只是用于测试的范例
-image: cover.jpg
 weight: 1       # You can add weight to some posts to override the default sorting (date descending)
 ---
 

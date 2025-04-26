@@ -8,6 +8,14 @@
  newtab = true
 
 [[social]]
+identifier = "rss"
+name = "Rss"
+url = "index.xml"
+
+[social.params]
+icon = "rss"
+
+[[social]]
 identifier = "github"
 name = "GitHub"
 url = "https://github.com/takuron"
