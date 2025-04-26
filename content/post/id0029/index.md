@@ -1,7 +1,7 @@
 ---
 title: OPNsense使用记录03：IPv6网络配置
 description: 在使用clash时请优先为git设置http代理，为git使用socks5代理会导致部分网站（aur.archlinux.org）产生TLS证书错误问题。
-slug: id0030
+slug: id0029
 date: 2024-12-29 00:00:00+0000
 image: https://s2.loli.net/2024/11/16/KABjvaXbhSmWkCg.webp
 categories:
