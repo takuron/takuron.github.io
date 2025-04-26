@@ -4,6 +4,14 @@ description: 在使用clash时请优先为git设置http代理，为git使用sock
 slug: id0030
 date: 2025-04-06 00:00:00+0000
 image: cover.jpg
+categories:
+  - Git
+tags:
+  - ArchLinux
+  - AUR
+  - Paru
+  - Git
+  - Clash
 weight: 1       # You can add weight to some posts to override the default sorting (date descending)
 ---
 
