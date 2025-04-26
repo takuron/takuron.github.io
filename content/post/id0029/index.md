@@ -1,0 +1,72 @@
+---
+title: OPNsense使用记录03：IPv6网络配置
+description: 在使用clash时请优先为git设置http代理，为git使用socks5代理会导致部分网站（aur.archlinux.org）产生TLS证书错误问题。
+slug: id0030
+date: 2024-12-29 00:00:00+0000
+image: https://s2.loli.net/2024/11/16/KABjvaXbhSmWkCg.webp
+categories:
+  - OPNsense
+tags:
+  - 网络
+  - 路由器
+  - 组网
+  - OPNsense
+  - IPv6
+weight: 1       # You can add weight to some posts to override the default sorting (date descending)
+---
+
+IPv6（Internet Protocol Version 6）是网络层协议的第二代标准协议，也被称为IPng（IP Next Generation）。它是Internet工程任务组IETF（Internet Engineering Task Force）设计的一套规范，是IPv4（Internet Protocol Version 4）的升级版本。随着国内大力推进IPv6网络的建设，目前启用IPv6与IPv4的双栈网络可以在不影响网络质量的同时获得具有公网IPv6的诸多便利，这里专门介绍一下如何在国内家宽条件下在OPNsense中配置IPv6网络。
+
+## IPv6基础：为什么应该使用IPv6
+
+本人不是猫在机房的运维，这里主要介绍家用环境有用的实践内容和也许可能大概有用的个人理解，如有错误欢迎批评指正，更多详细的基础理论可以看这里： [IPv6基础 曹世宏的博客](go?url=https://cshihong.github.io/2018/01/29/IPv6%E5%9F%BA%E7%A1%80/)。
+
+很多人都知道IPv6具有的巨大的地址空间及其带来的公网IP不要钱，但IPv6并不只是IPv4++，比起地址空间扩大更重要的是整个协议的技术细节都进行了升级，就说对我们使用来说最重要的，其配网难度和效率都获得了提升，且一些IPv4的常见问题也获得了一定程度的解决。个人觉得最重要的其实是其自动配置和去中心化理念。
+
+IPv6地址在小规模网络中大部分都可以通过SLAAC(Stateless Address Autoconfiguration，无状态地址自动配置)来获得，而这个过程本身的底层逻辑是终端设备自行声明检测冲突，不需要繁杂的手动配置或者DHCP通告。很多人会注意到即使在纯IPv4的网络中也会在Windows设置里看到一个IPv6地址，这就是在你网口本身启用了IPv6协议栈后尝试通过NDP（Neighbor Discovery Protocol，邻居发现协议，用于代替IPv4的ARP协议和ICMP路由发现）获取全球唯一地址的同时先行声明的链路本地地址。这个地址无需任何网关或者其他二层设备，而且由于无状态地址的声明机制和乐观DAD（Duplicate Address Detection，地址重复性检测）的存在，只要没有收到其他设备发送的ip冲突的邻居通告那么终端设备就会自己完成这个简单地本地链路建立，此时如果有其他设备与其同处一个二级链路他们之间的网络就已经自动配好了（本地链路地址根据MAC地址生成，很难冲突）。
+
+至于公网地址同样可以不依赖传统的静态配置或者DHCP，路由器在通过NDP建立路由表的同时会进行路由器通告，若选择只使用无状态网络则只需要路由器通告默认路由地址和网络前缀即可。在无状态网络下客户端会根据路由器获得的前缀（类似IPv4的网段）自动生成至多3个IPv6地址并进行DAD后即可使用，无需路由器的更多干预。这种无状态的配网可以说解放了小规模网络里面路由器的大量任务，客户端本身就能独立自动配置大量信息有效的提升了组网能力。
+
+而且最重要的是，这些并不是强制的换代。IPv4和IPv6的双栈网络可以同时保证兼容性和利用上新的特征，且在管理要求更高的企业那位中你仍可以选择DHCPv6和NAT这些传统的管理技术。至于其他的类似更简洁灵活的报头、自动检测链路MTU同时解决v4分片的问题、更强大的组播和更好的移动网络支持之类的，老顽固们不关心也不在乎，毕竟对他们来说问题只有不安全和麻烦。
+
+## OPNsense中为家庭网络配置IPv6
+
+### 默认最佳设置
+
+> 其实这个设置在第一篇中已经基本配置完毕了，这里的设置基于山东联通家宽。
+
+首先在接口/wan口获取可供分配的前缀，这里一定要勾选的只有使用ipv4连接获取，请求前缀长度在国内家宽会被直接无视可以不用设置，委派的前缀也是从56bit到直接不允许继续委派的64bit参差不齐，如果需要设置可以照着后面获取到的前缀长度来设置。
+
+![ 2024-12-30 09-21-34.webp](https://s2.loli.net/2024/12/30/AYfntsWNz18xelc.webp)
+
+lan口的IPv6设置为跟随wan口且允许手动调整DHCPv6和服务器通告。
+
+![ 2024-12-30 09-22-21.webp](https://s2.loli.net/2024/12/30/Oi2EJdkLKy4w9xt.webp)
+
+然后我们打开服务，路由器通告设置。这里路由器通告的设置类型详细可以直接参考官方的注释，如上文所说，家用环境中直接只启用SLAAC即可，因为像Android这种消费级设备据称很多根本就不支持DHCPv6。然后为了简洁这里直接取消选择使用DHCPv6的dns设置。
+
+![ 2024-12-30 09-22-39.webp](https://s2.loli.net/2024/12/30/4BsaXJFiAen5Nyo.webp)
+
+这里为IPv6配置再设置一下DNS，其实对于双栈网络来说设置IPv6的DNS服务器不是必须的，通过IPv4的DNS查询也可以获取AAAA类型的解析来进行IPv6访问。打开AdGuardHome，找到设置这里的设置向导，这里显示了所有AdGuardHome绑定的接口ip，这里可以记下pppoe接口的本地链路地址设置给IPv6通告。
+
+![ 2024-12-30 09-23-10.webp](https://s2.loli.net/2024/12/30/EIAsuFydaXPG9nR.webp)
+
+![ 2024-12-30 09-27-26.webp](https://s2.loli.net/2024/12/30/sKCtdqwoT9XNuzU.webp)
+
+再次查看AdGuardHome的日志可以看到已经有来自IPv6的查询记录。
+
+![ 2024-12-30 09-28-43.webp](https://s2.loli.net/2024/12/30/bqhGaPic9LzA6CN.webp)
+
+### DHCPv6的设置
+
+当然你依然可以选择传统的DHCPv6，先讲直接分配公网前缀的方法。当你按照上述的wan口拨号配置正确获取到了IPv6前缀且lan口正确跟随后，打开服务/DHCPv6可以看到你获取的前缀。此时只需要设置子网可分配范围和前缀委派范围就好了。前者类似DHCPv4，后者则允许下面的路由器继续获取子网前缀，所有这些设置只需要设置后缀的范围就可以了，前缀会根据wan口获取的产生变化，按照IPv6简写方法省略即可。
+
+![ 2024-12-30 09-22-39.webp](https://s2.loli.net/2024/12/30/4BsaXJFiAen5Nyo.webp)
+
+同时你也可以选择设置为局域网地址，这里我们回到lan口，修改IPv6为静态，然后从IPv6的内网地址段选取一段作为局域网地址。此时可以看到DHCPv6也会跟随变化，此时就可以使用IPv6的局域网地址了。
+
+> 不过不太推荐这样设置，自动配置的本地链路地址已经能满足大多数情况家用局域网的局域网互访需求了。这样为了保留IPv6公网能力还需要配置NAT转发或者NPTv6来做和公网地址前缀的映射，这里我不太需要就不详细演示了。
+
+![Snipaste_2024-11-27_16-55-52-tuya.webp](https://s2.loli.net/2024/12/30/8CrQdIMiwpFukYf.webp)
+
+![Snipaste_2024-11-27_17-00-51-tuya.webp](https://s2.loli.net/2024/12/30/TFE4tJqZQ7BlsMg.webp)
