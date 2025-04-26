@@ -14,3 +14,11 @@ url = "https://github.com/takuron"
 
 [social.params]
 icon = "brand-github"
+
+[[social]]
+identifier = "bilibili"
+name = "Bilibili"
+url = "https://space.bilibili.com/11680006"
+
+[social.params]
+icon = "brand-bilibili"
