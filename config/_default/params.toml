@@ -5,8 +5,8 @@ rssFullContent = true
 favicon = "/favicon.png"
 
 [footer]
-since = 2020
-customText = ""
+since = 2017
+customText = "<a href=\"https://www.travellings.cn/go.html\" target=\"_blank\" rel=\"noopener\" title=\"开往-友链接力\"><img src=\"https://www.travellings.cn/assets/logo.gif\" alt=\"开往-友链接力\" width=\"120\"></a>"
 
 [dateFormat]
 published = "Jan 02, 2006"

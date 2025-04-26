@@ -1,10 +1,10 @@
 # Configure main menu and social menu
  [[main]]
- identifier = "home"
- name = "Home01"
- url = "/"
+ identifier = "travelling"
+ name = "Travelling"
+ url = "https://www.travellings.cn/go.html"
  [main.params]
- icon = "home"
+ icon = "train"
  newtab = true
 
 [[social]]
