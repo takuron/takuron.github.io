@@ -67,7 +67,7 @@ p站原图，分辨率800*570：
 
 ![6897991-af2c9896d802b8e0.jpg](https://img.takuron.com/blogpost/6897991-af2c9896d802b8e0-tuya.webp)
 
-![6897991-a435f5d530ea8126-tuya](https://img.takuron.com/blogpost/6897991-a435f5d530ea8126-tuya.webp)
+![6897991-a435f5d530ea8126-tuya](https://img.takuron.com/blogpost/6897991-d527e378df5fcf39-tuya.webp)
 
 ![6897991-15ad8faa62e21df9.jpg](https://img.takuron.com/blogpost/6897991-15ad8faa62e21df9-tuya.webp)
 

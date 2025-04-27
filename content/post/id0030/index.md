@@ -3,7 +3,7 @@ title: 关于我AUR无法更新最终定位到git代理设置的事情
 description: 在使用clash时请优先为git设置http代理，为git使用socks5代理会导致部分网站（aur.archlinux.org）产生TLS证书错误问题。
 slug: id0030
 date: 2025-04-06 00:00:00+0000
-image: cover.jpg
+image: https://img.takuron.com/blogpost/zvl9yfrxzfmh.webp
 categories:
   - Git
   - 软件使用
@@ -15,8 +15,6 @@ tags:
   - Clash
 weight: 1       # You can add weight to some posts to override the default sorting (date descending)
 ---
-
-> 太长不看版本：在使用clash时请优先为git设置http代理，为git使用socks5代理会导致部分网站（aur.archlinux.org）产生TLS证书错误问题。
 
 在之前使用Paru更新的时候遇到任何网络连接问题我都直接开开开全局劫持代理就完事了。这次是由于我自己用的小猫咪版本更新导致TUN模式的系统服务老是有问题无法使用才发现的一个错误，我在使用paru更新AUR的PKGBUILD时候爆出了这样的错误：
 
@@ -44,7 +42,7 @@ git clone --no-progress -- https://aur.archlinux.org/vscodium-bin
 
 仍然没有问题，尝试验证性的从github克隆库没有问题，再尝试用设置同样代理的Firefox打开aur.archlinux.org网站也没有问题。也就是说问题准确定位是**git无法在通过代理的情况下验证特定网站（aur.archlinux.org）的TLS证书**？
 
-![?](80a7c383d3c7a3fb47d28c89aad71f64_MD5.jpg)
+![?](https://img.takuron.com/blogpost/80a7c383d3c7a3fb47d28c89aad71f64_MD5-tuya.webp)
 
 重新以git代理\TLS错误联合aur等关键词搜索，看到了[在与clash配合使用的情况下有些机器在git使用socks5代理会存在问题](https://www.cnblogs.com/searchstar/p/18437537)，故尝试**将代理改为http**，修好了：
 
@@ -56,4 +54,4 @@ git clone --no-progress -- https://aur.archlinux.org/vscodium-bin
 
 ```
 
-![?](80a7c383d3c7a3fb47d28c89aad71f64_MD5.jpg)
+![?](https://img.takuron.com/blogpost/80a7c383d3c7a3fb47d28c89aad71f64_MD5-tuya.webp)
