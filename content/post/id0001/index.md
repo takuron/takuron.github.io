@@ -2,7 +2,7 @@
 title: aide安装m2repository库教程
 description: 为aide安装Android Support Repository
 slug: id0001
-date: 2017-10-11 00:00:00+000
+date: 2017-10-11 00:00:00+0000
 categories:
   - Android开发
 tags:

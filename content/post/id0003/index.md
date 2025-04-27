@@ -2,7 +2,7 @@
 title: Android studio 2.2.3默认项目状态栏层级错误的解决方案
 description: 刚用Android Studio新建项目就遇到状态栏阴影Bug？这个恼人的视觉错误曾让我头疼数月！本文分享亲测有效的解决方案，帮你轻松去除状态栏阴影！
 slug: id0003
-date: 2017-10-15 00:00:00+000
+date: 2017-10-15 00:00:00+0000
 categories:
   - Android开发
 tags:
