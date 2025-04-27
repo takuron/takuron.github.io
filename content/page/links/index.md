@@ -1,5 +1,6 @@
 ---
 title: Links
+license: false
 links:
   - title: Sonatta： 生活小栈
     description: 孤坐有谁同此意 白云空见渚禽还
