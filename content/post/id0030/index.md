@@ -6,6 +6,7 @@ date: 2025-04-06 00:00:00+0000
 image: cover.jpg
 categories:
   - Git
+  - 软件使用
 tags:
   - ArchLinux
   - AUR
