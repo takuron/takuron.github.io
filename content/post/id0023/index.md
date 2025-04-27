@@ -23,12 +23,12 @@ weight: 1       # You can add weight to some posts to override the default sorti
 [备用下载位置](https://takuron.lanzous.com/b0armx34f)，密码：cug3
 
 1. 在官方APP中将手环的账号绑定（完成后可卸载）： ![photo_2021-04-10_14-47-16.jpg](https://i.loli.net/2021/04/10/2W3lUxhYoSRyiHA.jpg)
-2. 下载[huafetcher](go?url=https://codeberg.org/vanous/huafetcher)用于获取加密key 。
+2. 下载[huafetcher](https://codeberg.org/vanous/huafetcher)用于获取加密key 。
 3. 在第二项选择为xiaomi：![photo_2021-04-10_14-47-38.jpg](https://i.loli.net/2021/04/10/TPrMg1OHoKb6RL8.jpg)
 4. 选择Get token进入网页，登录小米账号（这里注意修改手机号为+86）：![photo_2021-04-10_14-47-47.jpg](https://i.loli.net/2021/04/10/pzZSOuPiwDX6HqY.jpg) ![photo_2021-04-10_14-47-51.jpg](https://i.loli.net/2021/04/10/lyeKfqND7PRovrV.jpg)
 5. 这里会报错，这是正常的，直接复制地址栏所有内容到URL result内：![photo_2021-04-10_14-47-57.jpg](https://i.loli.net/2021/04/10/j3o2SiMUryEH7IX.jpg) ![photo_2021-04-10_14-48-02.jpg](https://i.loli.net/2021/04/10/hsCqDYbkFyHPUun.jpg)
 6. 选择“Fetch key”，把下方生成的key复制走（到这里这个APP可以卸载了）
-7. 下载[Gadgetbridge](go?url=https://codeberg.org/Freeyourgadget/Gadgetbridge)，进入后点击右下角的“+”，然后搜索你的小米手环：![photo_2021-04-10_14-48-15.jpg](https://i.loli.net/2021/04/10/3nitAx8zl6vePhp.jpg)
+7. 下载[Gadgetbridge](https://codeberg.org/Freeyourgadget/Gadgetbridge)，进入后点击右下角的“+”，然后搜索你的小米手环：![photo_2021-04-10_14-48-15.jpg](https://i.loli.net/2021/04/10/3nitAx8zl6vePhp.jpg)
 8. 这里长按进去，拖到底下，找到认证密钥，输入你刚刚复制的key到里面，回去连接，就可以正常使用了。![photo_2021-04-10_14-48-19.jpg](https://i.loli.net/2021/04/10/Ww3GpNkdzHTuvPD.jpg)
 
 之后只要不动官方APP内的绑定关系就能一直使用了。
