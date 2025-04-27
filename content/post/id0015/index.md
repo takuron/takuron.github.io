@@ -17,7 +17,7 @@ weight: 1       # You can add weight to some posts to override the default sorti
 > 第四十条　中华人民共和国公民的通信自由和通信秘密受法律的保护。
 >——《中华人民共和国宪法》
 
-最近微信QQ封的越来越多了……真要说喜欢在网上胡说八道的封了就封了吧，我室友讨论了一晚上高数问题第二天QQ就被封了，这个老好人说他乱发表言论我都不信，更别说他自己都不知道为啥……所以一个真正自有可控的聊天软件已经成为了一个需求。无意中了解到了[Matrix](https://takuron.top/go?url=https://matrix.org/)系统，可以利用自有VPS安装服务端软件Synapse实现个人聊天服务器并通过多端的客户端软件连接，并且设置后可以以服务器作为代理连接所有Matrix服务器，反正已经有了一个网站服务器，就顺道玩玩吧。
+最近微信QQ封的越来越多了……真要说喜欢在网上胡说八道的封了就封了吧，我室友讨论了一晚上高数问题第二天QQ就被封了，这个老好人说他乱发表言论我都不信，更别说他自己都不知道为啥……所以一个真正自有可控的聊天软件已经成为了一个需求。无意中了解到了[Matrix](https://matrix.org/)系统，可以利用自有VPS安装服务端软件Synapse实现个人聊天服务器并通过多端的客户端软件连接，并且设置后可以以服务器作为代理连接所有Matrix服务器，反正已经有了一个网站服务器，就顺道玩玩吧。
 可是这个安装真的是……一言难尽。在我的研究之下也没完全弄明白基于系统的安装方法，而基于pip的安装又各种问题……这里记录一下我基于系统软件安装的实现方法。
 
 **本人才疏学浅，欢迎各位用过的大佬提出更好的方案，指正本人的错误。**
@@ -29,7 +29,7 @@ Debian 9 ；已安装宝塔和Oneindex；在Root用户下进行操作。
 
 ## 安装Synapse
 
-[Synapse](https://takuron.top/go?url=https://github.com/matrix-org/synapse/)是Matrix官方做的示例服务端，也是现在最推荐的客户端，这是官方的[安装文档](https://takuron.top/go?url=https://github.com/matrix-org/synapse/blob/master/INSTALL.md)，两种方法写的很凌乱……这里我以Debian为例写一下大概的步骤。
+[Synapse](https://github.com/matrix-org/synapse/)是Matrix官方做的示例服务端，也是现在最推荐的客户端，这是官方的[安装文档](https://github.com/matrix-org/synapse/blob/master/INSTALL.md)，两种方法写的很凌乱……这里我以Debian为例写一下大概的步骤。
 
 #### 1.安装Python环境
 
@@ -124,7 +124,7 @@ synctl start
 
 ## 配置反向代理
 
-你会发现，上一步建立的服务器是没办法直接用ip+端口打开的，因为官方默认建立的就是本地服务器，虽然有直接把服务器暴露给网络的设置，但我们可以使用反向代理的方法，像网站一样管理服务器。这不是我的小聪明，这是官方推荐的做法，如果你没有宝塔，你可以按照[官方文档](https://takuron.top/go?url=https://github.com/matrix-org/synapse/blob/master/docs/reverse_proxy.md)来用普通的网站软件来解决问题，**记得把默认的8008端口改成你的端口**。这里我简单写写宝塔的配置方法。
+你会发现，上一步建立的服务器是没办法直接用ip+端口打开的，因为官方默认建立的就是本地服务器，虽然有直接把服务器暴露给网络的设置，但我们可以使用反向代理的方法，像网站一样管理服务器。这不是我的小聪明，这是官方推荐的做法，如果你没有宝塔，你可以按照[官方文档](https://github.com/matrix-org/synapse/blob/master/docs/reverse_proxy.md)来用普通的网站软件来解决问题，**记得把默认的8008端口改成你的端口**。这里我简单写写宝塔的配置方法。
 
 新建一个网站，纯静态就可以，绑定好域名然后找网页设置-反向代理，按照底下图片的设置就好了，**记得修改端口为你自己的端口**。
 
@@ -139,7 +139,7 @@ synctl start
 
 ## 客户端连接
 
-**客户端足够多是我选择Matrix的重要原因**，这里有[可供连接的客户端的列表](https://takuron.top/go?url=https://matrix.org/clients/)，个人觉得其中[Riot.im](https://takuron.top/go?url=https://about.riot.im/)的客户端都已足够优秀并且支持足够多的平台，随便下载一个，将服务器设置为你的域名对应的网址（开TSL记得用https），然后就可以开始私有聊天了。
+**客户端足够多是我选择Matrix的重要原因**，这里有[可供连接的客户端的列表](https://matrix.org/clients/)，个人觉得其中[Riot.im](https://about.riot.im/)的客户端都已足够优秀并且支持足够多的平台，随便下载一个，将服务器设置为你的域名对应的网址（开TSL记得用https），然后就可以开始私有聊天了。
 
 ## 总结
 
