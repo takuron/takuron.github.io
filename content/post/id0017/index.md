@@ -34,6 +34,6 @@ weight: 1       # You can add weight to some posts to override the default sorti
 
 ### 3.更新到最新版的OBS
 
-亲测，OBS最新版完美兼容win10 1909，不需要开启兼容模式，所以建议大家直接去[官网]https://obsproject.com/) 下载最新版应用来使用。
+亲测，OBS最新版完美兼容win10 1909，不需要开启兼容模式，所以建议大家直接去[官网](https://obsproject.com/) 下载最新版应用来使用。
 
 以上设置后OBS的黑屏问题应该已经解决（主要是网上的教程都没写第二步所以拿来水一下下）
