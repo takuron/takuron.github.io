@@ -1,9 +1,9 @@
 ---
 title: OPNsense使用记录03：IPv6网络配置
-description: 在使用clash时请优先为git设置http代理，为git使用socks5代理会导致部分网站（aur.archlinux.org）产生TLS证书错误问题。
+description: 本文详细介绍了如何在OPNsense路由器上配置IPv6网络，特别针对国内家庭宽带环境。文章从IPv6的基础优势（如免费公网IP、自动配置SLAAC）讲起，分步指导用户设置WAN/LAN接口、配置路由器通告和DNS。帮助读者轻松实现在OPNsense中启用IPv4/IPv6双栈网络，享受IPv6带来的诸多便利。
 slug: id0029
 date: 2024-12-29 00:00:00+0000
-image: https://s2.loli.net/2024/11/16/KABjvaXbhSmWkCg.webp
+image: https://img.takuron.com/blogpost/KABjvaXbhSmWkCg.webp
 categories:
   - OPNsense
 tags:

@@ -16,6 +16,14 @@ url = "index.xml"
 icon = "rss"
 
 [[social]]
+identifier = "Email"
+name = "Email"
+url = "mailto:recevier0612@takuron.com"
+
+[social.params]
+icon = "mail"
+
+[[social]]
 identifier = "github"
 name = "GitHub"
 url = "https://github.com/takuron"
