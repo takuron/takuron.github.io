@@ -5,6 +5,29 @@ links:
     description: 孤坐有谁同此意 白云空见渚禽还
     website: https://sonatta.top/
     image: https://sonatta.top/images/avatar.png
+  - title: Davinci の 红茶馆
+    description: Break the code, change the world.
+    website: https://davincisama.com
+    image: https://davincisama.com/images/avatar.png  
+  - title: FANTASY博客
+    description: 记录学习、生活的小站。
+    website: https://blog.tigerxly.com/
+    image: https://img.sunxiaochuan258.com/avatar/tigerxly/avatar-tigerxly-256.jpg
+  - title: guqing's blog
+    description: 毕生所求无它，爱与自由而已
+    website: https://guqing.io/
+    image: guqing.jpeg
+  - title: 天雨的博客
+    description: Be smart. Be studious.
+    website: https://blog.irain.in/
+    image: tianyu.jpg
+  - title: Barkure
+    description: 
+    website: https://barku.re/
+    image: barkure.png
+    
+    
+
 menu:
     main: 
         weight: 4
