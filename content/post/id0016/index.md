@@ -1,36 +1,39 @@
 ---
-title: 记一次web工具制作：重制版与佛论禅
-description: 从修复旧工具到重制经典！本文记录了如何基于“与佛论禅”理念，结合AES加密与生僻字映射，打造一款全新的网页版混淆/加密工具，并分享过程中的技术探索与心得。
-slug: id0017
-date: 2020-04-09 00:00:00+0000
-image: https://i.loli.net/2020/04/09/C2HvEoy8lYzATPW.jpg
+title: OBS Studio在笔记本上黑屏问题的解决方案
+description: 笔记本OBS黑屏？Optimus惹的祸！本文详解如何通过显卡驱动、Win10图形设置等方法，强制OBS使用核显，帮你彻底解决黑屏问题，告别录屏/直播困扰。
+slug: id0016
+date: 2020-03-16 00:00:00+0000
+image: https://i.loli.net/2020/03/16/yH2f5qGeKJML3Wc.jpg
 categories:
-  - Web
+  - 软件使用
 tags:
-  - Web
-  - JavaScript
-  - HTML
+  - 软件使用
+  - OBS Studio
 weight: 1       # You can add weight to some posts to override the default sorting (date descending)
 ---
 
-不知道该做点什么，突然有人向我反馈我以前写的加密应用不兼容Android10，想想觉得，干脆为大家重制一款用来加密的工具吧，毕竟老的也是我三小时作品。
+众所周知，笔记本为了兼顾续航采用与传统台式PC不同的显卡使用模式，其中Optimus的确是某种意义上提升了笔记本的续航，但随之而来的就是OBS捕捉不到屏幕画面而彻底黑屏，所以根据Optimus的原理，我们要让OBS强制运行在核显上。
 
-为此我盯上了[与佛论禅](http://www.keyfc.net/bbs/tools/tudoucode.aspx)，这是一个很老的网页，里面是专门为老司机发链接而设计的一套混淆系统：利用一些生僻字来代指一些编码，从而达到混淆的目的。实现原理很简单，只要把某种混淆算法的结果的每一个字符对应一个生僻字就能实现。而且，不一定是混淆算法，同样的原理也可以用在加密算法上，脚踩两...一石二鸟，就这么愉快的开干了。
+![session-attachment-2020-03-16-085157.jpeg](https://i.loli.net/2020/03/16/5O1dyXYD2qTJMFP.jpg)
 
-![Snipaste_2020-04-09_22-06-46.png](https://i.loli.net/2020/04/09/KREvGg6IrqzZuTh.png)
+### 1.显卡设置中设置强制集成显卡
 
-加密部分不用我们再造轮子，[crypto-js](https://github.com/brix/crypto-js)可以实现现在所有常见的加密算法，为此我可以直接选择了比较好用的AES加密算法，首先遇到的难题是：将AES加密的文本进行对应，作为著名懒狗，当然不会做那种一个个写对应文本的工作啊（况且我的语文水平还不够），然后，我在GitHub发现了宝藏：
+以N卡为例，在右下角托盘找到Nvidia图标，然后显卡驱动中找到管理3D设置-程序设置，添加OBS进来后将其的模式改为集成显卡。
 
-![Snipaste_2020-04-09_22-32-55.png](https://i.loli.net/2020/04/09/QhjE5apUMmFeyNX.png)
+![Snipaste_2020-03-16_08-29-06.png](https://i.loli.net/2020/03/16/Wen52kqViEShBHO.png)
 
-感谢[这位老哥的对照表](https://github.com/Kwansy98/yufolunchan/blob/master/src/buddhism/TruthTable.java)，而且这位老哥的实现思路貌似和我一致，可惜是一个命令行的Java程序...
 
-随后就是界面，虽然bootstrap过气了，4.0的栅格布局还默认为手机尺寸上手有点难受。但难看不代表难用，神奇的使用Dreamweaver完成了一次网页设计，反正来的快吗…
+### 2.在Windows系统设置里面将OBS设置成“节能”
 
-最后就是有意思的部分来了，作为一个混子，我还没学到加密算法原理的部分（讲了估计也不会认真听，纯理论这么枯燥我是难以静心学的），但在加密的生产实践中发现了规律：所有以ASE加密算法计算出的结果均以`U2FsdGVkX1`开头，很多网站都给出了类似说明，但均没有给予证明，**希望大佬可以给与证明或者指出错误**。不过为了佛语的随机性，一个开头相同的佛语很影响效率，所以本人砍掉了开头，目前为止，没有无法解密的文本。
+**这是Win10 1903新出的设置**，在设置-显示里面寻找图形设置，选择经典应用，添加OBS Studio并将其设置为“节能”，亲测不开这个选项仍然会导致黑屏并且难以直接用核显打开OBS。
 
-另外，事后才知道ASE可以不需要密码。但当时为了统一性，本人为Web端设置了默认密码`TakuronDotTop`，这样在不需要加密仅需要混淆的情况下，可以直接将密码栏留空完成操作。
+![Snipaste_2020-03-16_08-28-08.png](https://i.loli.net/2020/03/16/3qi591mcAGCjv2b.png)
 
-成品如下图所示，[国内版网页](https://takuron-tool.gitee.io/talk-with-buddha/)，[国际版网页](https://takuron-tool.github.io/talk-with-buddha/)，源代码在[github开源](https://github.com/takuron/talk-with-buddha)，基于MIT开源协议，欢迎Fork和Star。
+![Snipaste_2020-03-16_08-28-25.png](https://i.loli.net/2020/03/16/isptSqgCBLeX261.png)
 
-![Snipaste_2020-04-09_22-52-50.png](https://i.loli.net/2020/04/09/u7J8ImLTUxdzjFP.png)
+
+### 3.更新到最新版的OBS
+
+亲测，OBS最新版完美兼容win10 1909，不需要开启兼容模式，所以建议大家直接去[官网](https://obsproject.com/) 下载最新版应用来使用。
+
+以上设置后OBS的黑屏问题应该已经解决（主要是网上的教程都没写第二步所以拿来水一下下）
