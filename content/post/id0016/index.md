@@ -16,14 +16,14 @@ weight: 1       # You can add weight to some posts to override the default sorti
 
 ![session-attachment-2020-03-16-085157.jpeg](https://i.loli.net/2020/03/16/5O1dyXYD2qTJMFP.jpg)
 
-### 1.显卡设置中设置强制集成显卡
+## 显卡设置中设置强制集成显卡
 
 以N卡为例，在右下角托盘找到Nvidia图标，然后显卡驱动中找到管理3D设置-程序设置，添加OBS进来后将其的模式改为集成显卡。
 
 ![Snipaste_2020-03-16_08-29-06.png](https://i.loli.net/2020/03/16/Wen52kqViEShBHO.png)
 
 
-### 2.在Windows系统设置里面将OBS设置成“节能”
+## 在Windows系统设置里面将OBS设置成“节能”
 
 **这是Win10 1903新出的设置**，在设置-显示里面寻找图形设置，选择经典应用，添加OBS Studio并将其设置为“节能”，亲测不开这个选项仍然会导致黑屏并且难以直接用核显打开OBS。
 
@@ -32,7 +32,7 @@ weight: 1       # You can add weight to some posts to override the default sorti
 ![Snipaste_2020-03-16_08-28-25.png](https://i.loli.net/2020/03/16/isptSqgCBLeX261.png)
 
 
-### 3.更新到最新版的OBS
+## 更新到最新版的OBS
 
 亲测，OBS最新版完美兼容win10 1909，不需要开启兼容模式，所以建议大家直接去[官网](https://obsproject.com/) 下载最新版应用来使用。
 

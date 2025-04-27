@@ -25,11 +25,11 @@ weight: 1       # You can add weight to some posts to override the default sorti
 
 这就很明了了，直接说解决方案。
 
-## 1.直接关闭整个验证
+## 直接关闭整个验证
 
 如果你在用一个台式机，联网验证对你来说完全没用（自家路由器难道还有需要登录的？），那么你可以直接关闭这个功能，将`EnableActiveProbing`参数改为0即可。
 
-## 2.验证DNS是否正常
+## 验证DNS是否正常
 
 如果你是笔记本，只想修好这个功能而不是一股脑的关死，那么电脑会首先确定你的ISP有没有给你的DNS投毒。以我目前的参数设置为例，在powershell里面查询：
 
@@ -41,7 +41,7 @@ nslookup dns.msftncsi.com
 
 如果你没有用这类软件，并且你不想通过改写host这种自欺欺人的手段来解决问题，那么你可以将被查询的域名换成阿里dns的域名`dns.alidns.com`，大多数情况下，其结果总对应其DNS服务器IP`223.5.5.5`、`2400:3200::1`，可以将对应值修改后以此验证。
 
-## 3.验证HTTP访问是否正常
+## 验证HTTP访问是否正常
 
 然后电脑会确定你的HTTP服务是否正常，其会向`ActiveWebProbeHost`对应的服务器请求一个`connecttest.txt`的文本文件，然后确认其值是否与`ActiveWebProbeContent`相等。以我目前的配置为例，这相当于：
 

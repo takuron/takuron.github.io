@@ -31,7 +31,7 @@ Debian 9 ；已安装宝塔和Oneindex；在Root用户下进行操作。
 
 [Synapse](https://github.com/matrix-org/synapse/)是Matrix官方做的示例服务端，也是现在最推荐的客户端，这是官方的[安装文档](https://github.com/matrix-org/synapse/blob/master/INSTALL.md)，两种方法写的很凌乱……这里我以Debian为例写一下大概的步骤。
 
-#### 1.安装Python环境
+### 1.安装Python环境
 
 ````
 apt-get install build-essential python3-dev libffi-dev \
@@ -39,7 +39,7 @@ apt-get install build-essential python3-dev libffi-dev \
                      libssl-dev python3-virtualenv libjpeg-dev libxslt1-dev
 ````
 
-#### 2.安装Synapse软件
+### 2.安装Synapse软件
 
 根据官方推荐，这里添加了Matrix的安装源来安装最新版的Matrix。以下指令建议一个个录入来确保都能正确执行。
 
@@ -64,7 +64,7 @@ apt install matrix-synapse-py3
 
 我虽然知道这样安装之后会在`/etc/matrix-synapse/homeserver.yaml`生成配置文件，但我根本无法用官方文档里面的方法关闭这个服务器，更别提更新配置文件了。而且不更新配置文件的这玩意**不是不好用，是没法用**！所以我用了个技巧绕过了官方的服务器。如果谁知道这种方法安装的服务器怎么操作请务必告诉我。
 
-#### 1.为新的服务器文件创建文件夹
+### 为新的服务器文件创建文件夹
 
 这里可以按照自己喜好来操作
 
@@ -74,7 +74,7 @@ cd synapse
 # /root/synapse/
 ````
 
-#### 2.创建一套配置文件
+### 创建一套配置文件
 
 ````
 /opt/venvs/matrix-synapse/bin/python -B -m synapse.app.homeserver -c homeserver.yaml --generate-config --server-name=takuron.top --report-stats=no
@@ -85,7 +85,7 @@ cd synapse
 这会儿就可以启动服务器了，但在此之前需要一些配置。
 
 
-#### 3.必须的配置
+### 必须的配置
 
 打开主配置文件`homeserver.yaml`，首先在207行：
 
@@ -118,7 +118,7 @@ enable_registration: true
 synctl start
 ````
 
-#### 4.可选的配置
+### 可选的配置
 
 ![19125154.png](https://i.loli.net/2020/02/09/6xgOVHXv7aZIiw2.jpg)
 
