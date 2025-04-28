@@ -5,12 +5,12 @@ slug: id0028
 date: 2024-11-27 00:00:00+0000
 image: https://img.takuron.com/blogpost/KABjvaXbhSmWkCg.webp
 categories:
-  - OPNsense
+  - opnsense
 tags:
   - 网络
   - 路由器
   - 组网
-  - OPNsense
+  - opnsense
   - AdGuardHome
 weight: 1       # You can add weight to some posts to override the default sorting (date descending)
 ---
