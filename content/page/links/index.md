@@ -5,7 +5,7 @@ links:
   - title: Tatools
     description: 个人开发使用的网页工具合集
     website: https://tatools.takuron.com/
-    image: tatools.jpg
+    image: tatools.png
   - title: Sonatta： 生活小栈
     description: 孤坐有谁同此意 白云空见渚禽还
     website: https://sonatta.top/
