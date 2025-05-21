@@ -10,7 +10,7 @@
 [[social]]
 identifier = "rss"
 name = "Rss"
-url = "index.xml"
+url = "/index.xml"
 
 [social.params]
 icon = "rss"
