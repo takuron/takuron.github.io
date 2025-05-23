@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>VPS on Takuron</title><link>https://takuron.com/tags/vps/</link><description>Recent content in VPS on Takuron</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sun, 09 Feb 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://takuron.com/tags/vps/index.xml" rel="self" type="application/rss+xml"/><item><title>安装Matrix系统（Riot.im）的服务端Synapse</title><link>https://takuron.com/post/id0015/</link><pubDate>Sun, 09 Feb 2020 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0015/</guid><description>&lt;img src="https://i.loli.net/2020/02/09/D9VJIRu8ioxEtls.png" alt="Featured image of post 安装Matrix系统（Riot.im）的服务端Synapse" />&lt;blockquote>
+&lt;p>第四十条　中华人民共和国公民的通信自由和通信秘密受法律的保护。
+——《中华人民共和国宪法》&lt;/p>&lt;/blockquote>
+&lt;p>最近微信QQ封的越来越多了……真要说喜欢在网上胡说八道的封了就封了吧，我室友讨论了一晚上高数问题第二天QQ就被封了，这个老好人说他乱发表言论我都不信，更别说他自己都不知道为啥……所以一个真正自有可控的聊天软件已经成为了一个需求。无意中了解到了&lt;a class="link" href="https://matrix.org/" target="_blank" rel="noopener"
+>Matrix&lt;/a>系统，可以利用自有VPS安装服务端软件Synapse实现个人聊天服务器并通过多端的客户端软件连接，并且设置后可以以服务器作为代理连接所有Matrix服务器，反正已经有了一个网站服务器，就顺道玩玩吧。
+可是这个安装真的是……一言难尽。在我的研究之下也没完全弄明白基于系统的安装方法，而基于pip的安装又各种问题……这里记录一下我基于系统软件安装的实现方法。&lt;/p>
+&lt;p>&lt;strong>本人才疏学浅，欢迎各位用过的大佬提出更好的方案，指正本人的错误。&lt;/strong>&lt;/p>
+&lt;h2 id="环境">环境
+&lt;/h2>&lt;p>Debian 9 ；已安装宝塔和Oneindex；在Root用户下进行操作。&lt;/p>
+&lt;h2 id="安装synapse">安装Synapse
+&lt;/h2>&lt;p>&lt;a class="link" href="https://github.com/matrix-org/synapse/" target="_blank" rel="noopener"
+>Synapse&lt;/a>是Matrix官方做的示例服务端，也是现在最推荐的客户端，这是官方的&lt;a class="link" href="https://github.com/matrix-org/synapse/blob/master/INSTALL.md" target="_blank" rel="noopener"
+>安装文档&lt;/a>，两种方法写的很凌乱……这里我以Debian为例写一下大概的步骤。&lt;/p>
+&lt;h3 id="1安装python环境">1.安装Python环境
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">apt&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">get&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="n">build&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">essential&lt;/span> &lt;span class="n">python3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libffi&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">python3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">pip&lt;/span> &lt;span class="n">python3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">setuptools&lt;/span> &lt;span class="n">sqlite3&lt;/span> \
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">libssl&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">python3&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">virtualenv&lt;/span> &lt;span class="n">libjpeg&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span> &lt;span class="n">libxslt1&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">dev&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="2安装synapse软件">2.安装Synapse软件
+&lt;/h3>&lt;p>根据官方推荐，这里添加了Matrix的安装源来安装最新版的Matrix。以下指令建议一个个录入来确保都能正确执行。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">apt install -y lsb-release wget apt-transport-https
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">wget -O /usr/share/keyrings/matrix-org-archive-keyring.gpg https://packages.matrix.org/debian/matrix-org-archive-keyring.gpg
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">echo &amp;#34;deb [signed-by=/usr/share/keyrings/matrix-org-archive-keyring.gpg] https://packages.matrix.org/debian/ $(lsb_release -cs) main&amp;#34; |
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> tee /etc/apt/sources.list.d/matrix-org.list
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt install matrix-synapse-py3
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>中间会提示以下两个界面，第一个问你服务器名称瞎写把，反正你不用这个服务器（下面会说），另一个问你是否愿意帮助他们，我们这么热心善良当然选否啊（滑稽）&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2020/02/09/95m7fPjerTa8Xis.png"
+loading="lazy"
+alt="微信图片_20200209122736.png"
+>&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2020/02/09/5k9nhGRHMVAyz8o.png"
+loading="lazy"
+alt="微信图片_20200209122743.png"
+>&lt;/p>
+&lt;p>安装好之后会自动运行服务器，如果是本机就可以访问&lt;code>http://localhost:8008&lt;/code>来检查软件是否安装好了，vps吗……待会儿再说。&lt;/p>
+&lt;h2 id="配置synapse">配置Synapse
+&lt;/h2>&lt;p>我虽然知道这样安装之后会在&lt;code>/etc/matrix-synapse/homeserver.yaml&lt;/code>生成配置文件，但我根本无法用官方文档里面的方法关闭这个服务器，更别提更新配置文件了。而且不更新配置文件的这玩意&lt;strong>不是不好用，是没法用&lt;/strong>！所以我用了个技巧绕过了官方的服务器。如果谁知道这种方法安装的服务器怎么操作请务必告诉我。&lt;/p>
+&lt;h3 id="为新的服务器文件创建文件夹">为新的服务器文件创建文件夹
+&lt;/h3>&lt;p>这里可以按照自己喜好来操作&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">mkdir synapse
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cd synapse
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># /root/synapse/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="创建一套配置文件">创建一套配置文件
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">/opt/venvs/matrix-synapse/bin/python -B -m synapse.app.homeserver -c homeserver.yaml --generate-config --server-name=takuron.top --report-stats=no
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>其中server-name按照官方要求是需要填写自己的域名的，这样才能正确的接入Matrix网络。不过如果是个人服务器的话其实可以随意写，第四个不知道是什么貌似也和接入Matrix网络有关，选no就好。&lt;/p>
+&lt;p>这会儿就可以启动服务器了，但在此之前需要一些配置。&lt;/p>
+&lt;h3 id="必须的配置">必须的配置
+&lt;/h3>&lt;p>打开主配置文件&lt;code>homeserver.yaml&lt;/code>，首先在207行：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">#line 207-215
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> - port: 8009
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> tls: false
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> type: http
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> x_forwarded: true
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> bind_addresses: [&amp;#39;::1&amp;#39;, &amp;#39;127.0.0.1&amp;#39;]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> resources:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> - names: [client, federation]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> compress: false
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>将端口改成8008以外的数，因为我们还没能成功关掉自带的服务器，这里曲线救国再建一个不同端口的服务器（反正默认都只能本地访问）&lt;/p>
+&lt;p>然后在862行：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">enable_registration: true
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>开启注册（如果私有服务器，&lt;strong>回头记着关&lt;/strong>，我是懒得一个个添加账号的，不如组织注册完后关掉注册）&lt;/p>
+&lt;p>然后在对应目录执行指令，启动服务器，我们的服务器就建立起来了。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">synctl start
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="可选的配置">可选的配置
+&lt;/h3>&lt;p>&lt;img src="https://i.loli.net/2020/02/09/6xgOVHXv7aZIiw2.jpg"
+loading="lazy"
+alt="19125154.png"
+>&lt;/p>
+&lt;h2 id="配置反向代理">配置反向代理
+&lt;/h2>&lt;p>你会发现，上一步建立的服务器是没办法直接用ip+端口打开的，因为官方默认建立的就是本地服务器，虽然有直接把服务器暴露给网络的设置，但我们可以使用反向代理的方法，像网站一样管理服务器。这不是我的小聪明，这是官方推荐的做法，如果你没有宝塔，你可以按照&lt;a class="link" href="https://github.com/matrix-org/synapse/blob/master/docs/reverse_proxy.md" target="_blank" rel="noopener"
+>官方文档&lt;/a>来用普通的网站软件来解决问题，&lt;strong>记得把默认的8008端口改成你的端口&lt;/strong>。这里我简单写写宝塔的配置方法。&lt;/p>
+&lt;p>新建一个网站，纯静态就可以，绑定好域名然后找网页设置-反向代理，按照底下图片的设置就好了，&lt;strong>记得修改端口为你自己的端口&lt;/strong>。&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2020/02/09/rQy6hfd4KsTPIWp.png"
+loading="lazy"
+alt="微信图片_20200209122759.png"
+>&lt;/p>
+&lt;p>提交，看看外网访问是不是这个界面：&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2020/02/09/KhWSLTrwGBlvMPd.png"
+loading="lazy"
+alt="390c7801fe180399277fbbbc22db44c6.png"
+>&lt;/p>
+&lt;p>是的话大功告成。&lt;/p>
+&lt;h2 id="客户端连接">客户端连接
+&lt;/h2>&lt;p>&lt;strong>客户端足够多是我选择Matrix的重要原因&lt;/strong>，这里有&lt;a class="link" href="https://matrix.org/clients/" target="_blank" rel="noopener"
+>可供连接的客户端的列表&lt;/a>，个人觉得其中&lt;a class="link" href="https://about.riot.im/" target="_blank" rel="noopener"
+>Riot.im&lt;/a>的客户端都已足够优秀并且支持足够多的平台，随便下载一个，将服务器设置为你的域名对应的网址（开TSL记得用https），然后就可以开始私有聊天了。&lt;/p>
+&lt;h2 id="总结">总结
+&lt;/h2>&lt;blockquote>
+&lt;p>软件写得好，不如软件文档写得好。
+——鲁迅&lt;/p>&lt;/blockquote>
+&lt;p>软件文档引发的惨案……软件是好东西但文档真的人类迷惑搞得我转了半天在研究出这个不是方法的方法。不过有一说一，一整天解决了我和小伙伴的通信隐私问题，也算是目前情况下的一种收获吧。愿自由技术永远引导人类发展。&lt;/p></description></item></channel></rss>
