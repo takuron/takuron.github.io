@@ -1,6 +1,6 @@
 ---
 title: 面向非码农的Git速成教程
-description: 在使用clash时请优先为git设置http代理，为git使用socks5代理会导致部分网站（aur.archlinux.org）产生TLS证书错误问题。
+description: 本文旨在帮助非程序员快速掌握Git基础与GitHub使用，通过Github Desktop图形化工具简化操作流程。内容涵盖版本控制核心概念（提交、分支、同步）、实际操作步骤（克隆仓库、修改回撤、拉取更新）及协作流程（Fork、Pull Request），强调理解基本原理的重要性，助力学生提升代码管理效率与跨学科协作能力。
 slug: id0031
 date: 2025-05-23 00:00:00+0000
 categories:
