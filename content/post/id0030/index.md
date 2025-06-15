@@ -3,7 +3,7 @@ title: 关于我AUR无法更新最终定位到git代理设置的事情
 description: 在使用clash时请优先为git设置http代理，为git使用socks5代理会导致部分网站（aur.archlinux.org）产生TLS证书错误问题。
 slug: id0030
 date: 2025-04-06 00:00:00+0000
-image: https://img.takuron.com/blogpost/id0031/aJJ8dDJn39grfaRF.webp
+image: https://img.takuron.com/blogpost/zvl9yfrxzfmh.webp
 categories:
   - Git
   - 软件使用
