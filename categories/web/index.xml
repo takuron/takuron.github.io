@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Web on Takuron</title><link>https://takuron.com/categories/web/</link><description>Recent content in Web on Takuron</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 09 Apr 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://takuron.com/categories/web/index.xml" rel="self" type="application/rss+xml"/><item><title>记一次web工具制作：重制版与佛论禅</title><link>https://takuron.com/post/id0017/</link><pubDate>Thu, 09 Apr 2020 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0017/</guid><description>&lt;img src="https://i.loli.net/2020/04/09/C2HvEoy8lYzATPW.jpg" alt="Featured image of post 记一次web工具制作：重制版与佛论禅" />&lt;p>不知道该做点什么，突然有人向我反馈我以前写的加密应用不兼容Android10，想想觉得，干脆为大家重制一款用来加密的工具吧，毕竟老的也是我三小时作品。&lt;/p>
+&lt;p>为此我盯上了&lt;a class="link" href="http://www.keyfc.net/bbs/tools/tudoucode.aspx" target="_blank" rel="noopener"
+>与佛论禅&lt;/a>，这是一个很老的网页，里面是专门为老司机发链接而设计的一套混淆系统：利用一些生僻字来代指一些编码，从而达到混淆的目的。实现原理很简单，只要把某种混淆算法的结果的每一个字符对应一个生僻字就能实现。而且，不一定是混淆算法，同样的原理也可以用在加密算法上，脚踩两&amp;hellip;一石二鸟，就这么愉快的开干了。&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2020/04/09/KREvGg6IrqzZuTh.png"
+loading="lazy"
+alt="Snipaste_2020-04-09_22-06-46.png"
+>&lt;/p>
+&lt;p>加密部分不用我们再造轮子，&lt;a class="link" href="https://github.com/brix/crypto-js" target="_blank" rel="noopener"
+>crypto-js&lt;/a>可以实现现在所有常见的加密算法，为此我可以直接选择了比较好用的AES加密算法，首先遇到的难题是：将AES加密的文本进行对应，作为著名懒狗，当然不会做那种一个个写对应文本的工作啊（况且我的语文水平还不够），然后，我在GitHub发现了宝藏：&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2020/04/09/QhjE5apUMmFeyNX.png"
+loading="lazy"
+alt="Snipaste_2020-04-09_22-32-55.png"
+>&lt;/p>
+&lt;p>感谢&lt;a class="link" href="https://github.com/Kwansy98/yufolunchan/blob/master/src/buddhism/TruthTable.java" target="_blank" rel="noopener"
+>这位老哥的对照表&lt;/a>，而且这位老哥的实现思路貌似和我一致，可惜是一个命令行的Java程序&amp;hellip;&lt;/p>
+&lt;p>随后就是界面，虽然bootstrap过气了，4.0的栅格布局还默认为手机尺寸上手有点难受。但难看不代表难用，神奇的使用Dreamweaver完成了一次网页设计，反正来的快吗…&lt;/p>
+&lt;p>最后就是有意思的部分来了，作为一个混子，我还没学到加密算法原理的部分（讲了估计也不会认真听，纯理论这么枯燥我是难以静心学的），但在加密的生产实践中发现了规律：所有以ASE加密算法计算出的结果均以&lt;code>U2FsdGVkX1&lt;/code>开头，很多网站都给出了类似说明，但均没有给予证明，&lt;strong>希望大佬可以给与证明或者指出错误&lt;/strong>。不过为了佛语的随机性，一个开头相同的佛语很影响效率，所以本人砍掉了开头，目前为止，没有无法解密的文本。&lt;/p>
+&lt;p>另外，事后才知道ASE可以不需要密码。但当时为了统一性，本人为Web端设置了默认密码&lt;code>TakuronDotTop&lt;/code>，这样在不需要加密仅需要混淆的情况下，可以直接将密码栏留空完成操作。&lt;/p>
+&lt;p>成品如下图所示，&lt;a class="link" href="https://takuron-tool.gitee.io/talk-with-buddha/" target="_blank" rel="noopener"
+>国内版网页&lt;/a>，&lt;a class="link" href="https://takuron-tool.github.io/talk-with-buddha/" target="_blank" rel="noopener"
+>国际版网页&lt;/a>，源代码在&lt;a class="link" href="https://github.com/takuron/talk-with-buddha" target="_blank" rel="noopener"
+>github开源&lt;/a>，基于MIT开源协议，欢迎Fork和Star。&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2020/04/09/u7J8ImLTUxdzjFP.png"
+loading="lazy"
+alt="Snipaste_2020-04-09_22-52-50.png"
+>&lt;/p></description></item><item><title>cloudflare对gitlab page的加速效果</title><link>https://takuron.com/post/id0010/</link><pubDate>Fri, 06 Jul 2018 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0010/</guid><description>&lt;img src="https://i.loli.net/2020/02/07/mP7ndhTLWK4OzJX.jpg" alt="Featured image of post cloudflare对gitlab page的加速效果" />&lt;p>最近了解到了国外的免费cdn加速商cloudflare，自带https比那个要备案还非要收钱才能用https的百度加速云看上去好不少，所以测试了一下加速效果。&lt;/p>
+&lt;p>以下是本人新建的测试网页 &lt;strong>（已失效）&lt;/strong>，二者网页内容完全相同：&lt;/p>
+&lt;p>[&lt;a class="link" href="https://speedtest-gitlab.zsxh.me/" target="_blank" rel="noopener"
+>gitlab无加速&lt;/a>](&lt;a class="link" href="https://speedtest-gitlab.zsxh.me/" target="_blank" rel="noopener"
+>https://speedtest-gitlab.zsxh.me/&lt;/a>)&lt;/p>
+&lt;p>[&lt;a class="link" href="https://speedtest-cloudflare.zsxh.me/" target="_blank" rel="noopener"
+>cloudflare加速后&lt;/a>](&lt;a class="link" href="https://speedtest-cloudflare.zsxh.me/" target="_blank" rel="noopener"
+>https://speedtest-cloudflare.zsxh.me/&lt;/a>)&lt;/p>
+&lt;p>首先直观感受：无变化，甚至还能慢一点，尤其是图片加载的时候（这貌似在下面的文件下载测试时获得了证实），但是统计网站给的数据却让人大跌眼镜。&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2020/03/26/faMh5uvgPX7Sm1x.jpg"
+loading="lazy"
+alt="6897991-93bb44ab03ebf065.jpg"
+>&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2020/03/26/eTKQSd9ukmFIMCf.jpg"
+loading="lazy"
+alt="6897991-da6128f02fa2482a.jpg"
+>&lt;/p>
+&lt;p>前面的是没有经过加速的网页，很明显加载速度完全不是一个量级，后者秒杀前者，这和我们的直观体验不服，所以我换了一个更真实的网页测速器，[&lt;a class="link" href="https://www.webpagetest.org/" target="_blank" rel="noopener"
+>webpagetest&lt;/a>](&lt;a class="link" href="https://takuron.top/go?url=https://www.webpagetest.org/" target="_blank" rel="noopener"
+>https://takuron.top/go?url=https://www.webpagetest.org/&lt;/a>)是一个利用真实浏览器来测试整个网页加载过程的测试网站，我们用它的北京节点来测试一下。&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2020/03/26/TRJfNXGw6MuFZrk.jpg"
+loading="lazy"
+alt="6897991-fe680699c8973246.jpg"
+>&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2020/03/26/cDnTYQsWBu95NgK.jpg"
+loading="lazy"
+alt="6897991-f24320387b2c93fc.jpg"
+>&lt;/p>
+&lt;p>很明显这个才和实际体验相符，cloudglare对文本文件进行了有效的加速，可对于图片等资源文件却一点不留情面，不仅没能加速反而搞起了减速。&lt;/p>
+&lt;p>文件下载测试可以选择网站里最上方的download，会出现一个视屏文件，利用那个视频文件可以测试下载速度。&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2020/03/26/w7y1Uhrt5kDoe4L.jpg"
+loading="lazy"
+alt="6897991-b804052a034d1c9b.jpg"
+>&lt;/p>
+&lt;p>看样子不仅是没有起到加速的作用，反而出现了减速的迹象，果然没有对媒体文件进行缓存。&lt;/p>
+&lt;p>综上，cloudflare对于页面的加速还是不错的，可惜由于抠门，媒体资源文件走cdn的减速抵消了页面的加速效果，所以说使不使用cloudflare完全是一个可选项，因为就算加速效果也不明显。&lt;/p></description></item><item><title>利用gitlab搭建静态页面并开启https</title><link>https://takuron.com/post/id0008/</link><pubDate>Sun, 25 Feb 2018 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0008/</guid><description>&lt;p>踩了无数的坑终于搞明白gitlab pages如何搭建了（一般我写的东西都是自己踩坑后分享的，不喜欢写能找到的资料），决定写一写。&lt;/p>
+&lt;p>为什么不用GitHub或者coding？因为GitHub最近拦截了百度蜘蛛，懂SEO都知道这是对网站被搜索引擎收录的毁灭性打击，并且GitHub不支持自定义域名https，而coding需要人工审核还巨慢。所以这里我决定使用gitlab&lt;/p>
+&lt;p>与GitHub pages不同，gitlab pages的构建基于gitlab cl，也就是大部分pages的配置都基于 &lt;strong>配置文件而不是项目设置&lt;/strong> ，连基本的纯静态HTML都需要配置文件，我们就从最基本的开始探究。&lt;/p>
+&lt;h2 id="静态html的搭建">静态HTML的搭建
+&lt;/h2>&lt;p>首先我们访问gitlab，点开&lt;a class="link" href="https://gitlab.com/pages" target="_blank" rel="noopener"
+>用户：pages的首页&lt;/a>，这里面是所有gitlab支持的静态pages类型，我们选择plain-html并克隆。&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2020/02/07/hFr2vjPtECwmJUf.jpg"
+loading="lazy"
+alt="005-KRocyly1foskji8qqoj31wq13egwl.jpg"
+>&lt;/p>
+&lt;p>（或者对于纯HTML这种简单的项目，你也可以自己新建.gitlab-ci.yml文件，里面会提示有模板，按照模板写好文件后新建public文件夹往里面放网页就可以了）&lt;/p>
+&lt;p>接着项目会自动进行一段时间的构建，构建好后就可以在Pages里看到网址了。&lt;/p>
+&lt;p>（如果想新建 用户名.gitlab.io 为网址的个人页与GitHub同理，把项目名命名成这个就好了）&lt;/p>
+&lt;h2 id="jekyll项目的搭建">jekyll项目的搭建
+&lt;/h2>&lt;p>对于jekyll项目，正常可以与静态HTML同理，最简单的方法当然是克隆示例然后制作，可是更多时候遇到的是准备部署模板，对于模板更好用的当然是自己创建配置文件时要注意 &lt;strong>一定要同时创建一个Gemfile文件&lt;/strong> ，如果不知道怎么写可以直接复制官方的示例。（别问我为什么我也不知道，我只知道没有这玩意会失败）&lt;/p>
+&lt;h2 id="绑定域名并开启https">绑定域名并开启https
+&lt;/h2>&lt;p>如果你没有域名，那么对你而言本文已经结束了，因为gitlab的域名都自带https，这里要讲讲怎么自己申请自己域名的可信签名。&lt;/p>
+&lt;p>不同于国内的coding，gitlab要求你自己申请签名，这里我推荐&lt;a class="link" href="https://freessl.org" target="_blank" rel="noopener"
+>freessl.org&lt;/a>，首先打开网站，填入你的域名，公证机构选默认的就行。然后他会让你填邮箱和证书类型，其中要注意 &lt;strong>证书类型一定要选RSA&lt;/strong> 其他的保留默认就好。&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2020/02/07/HXBquwj9nkSGxJZ.jpg"
+loading="lazy"
+alt="005-KRocyly1fosl3r37lkj31wq12eagk.jpg"
+>&lt;/p>
+&lt;p>然后他会进行签名认证，添加解析什么的不会自行百度。成功后就会产生两串字符串和一个下载按钮，建议把签名下载下来方便续签（其实注册账户也可以达到同样目的），还有签名是很重要的网站安全凭证，无事情不要随意透露private key。&lt;/p>
+&lt;p>接着我们到gitlab项目页，找到设置里的page，选择new domain会出现如下页面。其中第一个是域名，第二个和第三个是签名，把刚刚申请网页里的第一个复制到第二个框，第二个到第三个框就好了。&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2020/02/07/LBWREYUswcyQCxg.jpg"
+loading="lazy"
+alt="005-KRocyly1foslys2t4mj31wq12eahm.jpg"
+>&lt;/p>
+&lt;p>接着他会让你新建一个验证解析，这个是今年新加的来解决页面安全问题，老老实实添加解析我不解释了。（貌似后面可以删）&lt;/p>
+&lt;p>最后给域名添加 你的用户名.gitlab.io 的cname，再打开你的网站，完美。&lt;/p></description></item></channel></rss>
