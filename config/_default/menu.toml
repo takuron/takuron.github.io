@@ -38,3 +38,11 @@ url = "https://space.bilibili.com/11680006"
 
 [social.params]
 icon = "brand-bilibili"
+
+[[social]]
+identifier = "mastodon"
+name = "Mastodon"
+url = "https://wxw.moe/@takuron"
+
+[social.params]
+icon = "brand-mastodon"
