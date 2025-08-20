@@ -440,9 +440,7 @@ paru -S webstorm
 
 ### 其他常用软件
 
-- 视频：Vlc播放器 ``paru -S vlc``
+- 视频：Vlc播放器 ``paru -S vlc vlc-plugins-all``
 - 图形化文本编辑器：Visual Studio Code ``paru -S code``
 - 办公三件套：LibreOffice ``paru -S libreoffice-fresh libreoffice-fresh-zh-cn`` 或者 ``paru -S libreoffice-still libreoffice-still-zh-cn``
 - 录屏/直播：OBS ``paru -S  obs-studio``
-
-(未完待续)
