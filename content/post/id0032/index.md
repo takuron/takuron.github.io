@@ -394,6 +394,50 @@ sudo ufw enable
 
 这个防火墙不用我多介绍了吧无论cli还是衍生的gui都是最简单的那一类了。注意放行一些类似LocalSend之类的传入请求即可，大多数时候拒绝入站能根本上解决一些公共网络中的安全问题。
 
+### Java环境
+
+- [Java - Arch Linux 中文维基](https://wiki.archlinuxcn.org/wiki/Java)
+
+ArchLinux的Java充分考虑了Java生态碎片化的情况，准备了 java-runtime-common和java-environment-common包作为系统的Java环境管理工具，使得开发者可以在命令行切换目前使用的Java版本。
+
+我们先安装一个21版本的OpenJDK
+
+```
+paru -S jdk21-openjdk
+```
+
+此时可以看到java-runtime-common也被作为依赖安装到了设备上，我们用命令查看一下目前支持的java环境：
+
+```
+# archlinux-java status
+
+Available Java environments:
+  java-21-openjdk (default)
+
+```
+
+可以看到我们所有的java环境和目前启动Java程序所使用的默认Java路径，后续我们只需要用：
+
+```
+archlinux-java set <JAVA_ENV_NAME>
+```
+
+就可以切换目前使用的Java环境了。
+
+### intellij-idea系IDE的安装
+
+我们可以在AUR里安装几乎全部的jetbrain公司的产品，但是安装后直接点击桌面图标是无法启动的（演示以webstorm为例）：
+
+```
+paru -S webstorm
+```
+
+此时**在电脑中已有Java环境的情况下**前往安装目录寻找启动脚本并执行。该脚本可以在没有jetbarin的jre的情况下用默认Java环境打开对应IDE。
+
+完成初始化后，我们在主菜单使用``Ctrl + Shift + A``快捷键搜索``选择IDE的启动Java运行时``（中文）或者``Choose Boot Java Runtime for the IDE``（英文），在新建里面随便下载一个（首次安装）/选择上一个IDE已经下载好的路径即可。
+
+![选择Java运行环境](https://img.takuron.com/blogpost/Wzc2CbXeL8LBjczL.webp)
+
 ### 其他常用软件
 
 - 视频：Vlc播放器 ``paru -S vlc``
