@@ -9,7 +9,6 @@ categories:
 tags:
   - Linux
   - ArchLinux
-  - 协同开发
 weight: 1       # You can add weight to some posts to override the default sorting (date descending)
 ---
 
@@ -118,7 +117,22 @@ sudo pacman -S ibus-rime
 sudo pacman librime-data-luna-pinyin
 ```
 
-## 美化与完善
+Gnome的ibus无法通过正常的``ibus-setup``里的配置进行添加和编辑，也无法检查常规路径里面大的配置文件，且gnome输入法设置里的设置又少的可怜。以为ibus设置横向选词为例，根据[这个帖子](https://github.com/rime/ibus-rime/issues/52)，正确的Gnome配套的ibus配置文件位于:
+
+```
+~/.config/ibus/rime/build/ibus_rime.yaml
+```
+
+打开这个文件后修改以下选项即可实现横向输入：
+
+```
+style:
+   horizontal: true
+```
+
+## 美化、完善与常用软件
+
+- [可选配置（基础篇） | archlinux 简明指南](https://arch.icekylin.online/guide/advanced/optional-cfg-1.html)
 
 ### 语言与地区设置
 
@@ -136,7 +150,7 @@ LANG=en_US.UTF-8
 - ``~/.xinitrc``
 - ``~/.xprofile``
 
-为：
+添加如下内容：
 
 ```
 export LANG=zh_CN.UTF-8
