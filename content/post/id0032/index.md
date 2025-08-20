@@ -130,7 +130,7 @@ style:
    horizontal: true
 ```
 
-## 美化、完善与常用软件
+## 美化与完善
 
 - [可选配置（基础篇） | archlinux 简明指南](https://arch.icekylin.online/guide/advanced/optional-cfg-1.html)
 
@@ -336,5 +336,69 @@ paru -S ttf-roboto noto-fonts noto-fonts-cjk adobe-source-han-sans-cn-fonts adob
   </config>
 </fontconfig>
 ```
+
+### TCP调参
+
+- [TCP 迷之调参 - 智能网络优化工具](https://www.omnitt.com/)
+
+估计玩过VPS的都多少了解过TCP调参这个事情吧。虽然大多数在服务器上可以有效提高吞吐量的设置在终端设备上就是浪费内存浪费电，但有些算法类的调整（例如bbr拥塞控制）还是能有效提高设备网络性能的。
+
+为``/etc/sysctl.conf``文件添加如下内容，主要是改变队列管理和拥塞控制算法其他都可动可不动：
+
+```
+# --- 笔记本网络与系统优化 ---
+
+# 使用现代队列管理算法，对抗缓冲区膨胀，降低延迟
+net.core.default_qdisc = cake
+
+# 启用 BBR 拥塞控制算法以提升速度和吞吐量
+net.ipv4.tcp_congestion_control = bbr
+
+# 启用 TCP Fast Open 减少连接延迟
+net.ipv4.tcp_fastopen = 3
+
+# 允许重用 TIME_WAIT 状态的连接
+net.ipv4.tcp_tw_reuse = 1
+
+# 连接空闲后更快地恢复传输速度
+net.ipv4.tcp_slow_start_after_idle = 0
+
+```
+
+### Gnome插件推荐
+
+为了给gnome安装插件，首先需要安装gnome-shell-extensions和gnome-browser-connector，如果仍然无法安装请再安装对应浏览器里的插件。（和其他发行版不同**不需要安装chrome-gnome-shell**）
+
+```
+paru -S gnome-shell-extensions gnome-browser-connector
+```
+
+以下是本人在用的一些插件：
+
+- [AppIndicator and KStatusNotifierItem Support ](https://extensions.gnome.org/extension/615/appindicator-support/)：恢复被gnome取消的托盘
+- [Vitals](https://extensions.gnome.org/extension/1460/vitals/): 清爽的硬件监控
+
+## 常用软件
+
+- [Linux 日常操作与基础知识 | archlinux 简明指南](https://arch.icekylin.online/guide/advanced/system-ctl.html)
+
+### 防火墙
+
+按照个人使用习惯安装ufw防火墙和其gui版本gufw并启动：
+
+```
+paru -S ufw gufw
+sudo systemctl enable --now ufw.service
+sudo ufw enable
+```
+
+这个防火墙不用我多介绍了吧无论cli还是衍生的gui都是最简单的那一类了。注意放行一些类似LocalSend之类的传入请求即可，大多数时候拒绝入站能根本上解决一些公共网络中的安全问题。
+
+### 其他常用软件
+
+- 视频：Vlc播放器 ``paru -S vlc``
+- 图形化文本编辑器：Visual Studio Code ``paru -S code``
+- 办公三件套：LibreOffice ``paru -S libreoffice-fresh libreoffice-fresh-zh-cn`` 或者 ``paru -S libreoffice-still libreoffice-still-zh-cn``
+- 录屏/直播：OBS ``paru -S  obs-studio``
 
 (未完待续)
