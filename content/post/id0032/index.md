@@ -118,4 +118,209 @@ sudo pacman -S ibus-rime
 sudo pacman librime-data-luna-pinyin
 ```
 
+## 美化与完善
+
+### 语言与地区设置
+
+- [简体中文本地化 - Arch Linux 中文维基](https://wiki.archlinuxcn.org/wiki/%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%E6%9C%AC%E5%9C%B0%E5%8C%96)
+
+我们按照以上教程先配置一个英文的全局local来防止tty中的中文渲染错误，修改`` /etc/locale.conf``：
+
+```
+LANG=en_US.UTF-8
+```
+
+然后分别编辑以下文件：
+
+- ``~/.bashrc``
+- ``~/.xinitrc``
+- ``~/.xprofile``
+
+为：
+
+```
+export LANG=zh_CN.UTF-8
+export LANGUAGE=zh_CN:en_US
+```
+
+### 中文字体完善
+
+- [字体配置 - Arch Linux 中文维基](https://wiki.archlinuxcn.org/wiki/%E5%AD%97%E4%BD%93%E9%85%8D%E7%BD%AE)
+- [字体配置/中文 - Arch Linux 中文维基](https://wiki.archlinuxcn.org/wiki/%E5%AD%97%E4%BD%93%E9%85%8D%E7%BD%AE/%E4%B8%AD%E6%96%87)
+
+接下来我们修改一下字体的配置，让默认字体更接近Android原生的字体风格。首先下载我们需要的字体，这里等宽字体我选择了新的[Maple Mono](https://github.com/subframe7536/Maple-font)，其可以将中文设置成拉丁字母双倍宽度来实现中英混合的情况下的等宽，比强行压缩汉字的更纱黑体效果好太多。其中如果maple mono系列如果遇到需要选择的情况请选archlinuxcn源。
+
+```
+paru -S ttf-roboto noto-fonts noto-fonts-cjk adobe-source-han-sans-cn-fonts adobe-source-han-serif-cn-fonts ttf-dejavu ttf-maplemono-nf-unhinted ttf-maplemono-nf-cn-unhinted
+```
+然后我们修改`~/.config/fontconfig/fonts.conf`，以下是我根据配置建议写的Android字体配置，其中为了美观仍然选择的noto sans ckj sc为中文字体，并改用了maple系为等宽字体，这里也可以选择按上面网址里的配置修复Bug：
+
+```
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <its:rules xmlns:its="http://www.w3.org/2005/11/its" version="1.0">
+    <its:translateRule
+      translate="no"
+      selector="/fontconfig/*[not(self::description)]"
+    />
+  </its:rules>
+
+  <description>Android Font Config</description>
+
+  <!-- Font directory list -->
+
+  <dir>/usr/share/fonts</dir>
+  <dir>/usr/local/share/fonts</dir>
+  <dir prefix="xdg">fonts</dir>
+  <!-- the following element will be removed in the future -->
+  <dir>~/.fonts</dir>
+
+  <!-- 关闭内嵌点阵字体 -->
+  <match target="font">
+    <edit name="embeddedbitmap" mode="assign">
+      <bool>false</bool>
+    </edit>
+  </match>
+
+  <!-- 英文默认字体使用 Roboto 和 Noto Serif ,终端使用 Maple Mono NF.。-->
+  <match>
+    <test qual="any" name="family">
+      <string>serif</string>
+    </test>
+    <edit name="family" mode="prepend" binding="strong">
+      <string>Noto Serif</string>
+    </edit>
+  </match>
+  <match target="pattern">
+    <test qual="any" name="family">
+      <string>sans-serif</string>
+    </test>
+    <edit name="family" mode="prepend" binding="strong">
+      <string>Roboto</string>
+    </edit>
+  </match>
+  <match target="pattern">
+    <test qual="any" name="family">
+      <string>monospace</string>
+    </test>
+    <edit name="family" mode="prepend" binding="strong">
+      <string>Maple Mono NF</string>
+    </edit>
+  </match>
+
+  <!-- 中文默认字体使用　Noto Sans CJK SC ,终端使用 Maple Mono NF CN。-->
+  <match>
+    <test name="lang" compare="contains">
+      <string>zh</string>
+    </test>
+    <test name="family">
+      <string>serif</string>
+    </test>
+    <edit name="family" mode="prepend">
+      <string>Noto Serif CJK SC</string>
+    </edit>
+  </match>
+  <match>
+    <test name="lang" compare="contains">
+      <string>zh</string>
+    </test>
+    <test name="family">
+      <string>sans-serif</string>
+    </test>
+    <edit name="family" mode="prepend">
+      <string>Noto Sans CJK SC</string>
+    </edit>
+  </match>
+  <match>
+    <test name="lang" compare="contains">
+      <string>zh</string>
+    </test>
+    <test name="family">
+      <string>monospace</string>
+    </test>
+    <edit name="family" mode="prepend">
+      <string>Maple Mono NF CN</string>
+    </edit>
+  </match>
+
+  <!-- Windows & Linux Chinese fonts. -->
+  <!-- 把所有常见的中文字体映射到思源黑体和思源宋体，这样当这些字体未安装时会使用思源黑体和思源宋体.
+解决特定程序指定使用某字体，并且在字体不存在情况下不会使用fallback字体导致中文显示不正常的情况. -->
+  <match target="pattern">
+    <test qual="any" name="family">
+      <string>WenQuanYi Zen Hei</string>
+    </test>
+    <edit name="family" mode="assign" binding="same">
+      <string>Source Han Sans CN</string>
+    </edit>
+  </match>
+  <match target="pattern">
+    <test qual="any" name="family">
+      <string>WenQuanYi Micro Hei</string>
+    </test>
+    <edit name="family" mode="assign" binding="same">
+      <string>Source Han Sans CN</string>
+    </edit>
+  </match>
+  <match target="pattern">
+    <test qual="any" name="family">
+      <string>WenQuanYi Micro Hei Light</string>
+    </test>
+    <edit name="family" mode="assign" binding="same">
+      <string>Source Han Sans CN</string>
+    </edit>
+  </match>
+  <match target="pattern">
+    <test qual="any" name="family">
+      <string>Microsoft YaHei</string>
+    </test>
+    <edit name="family" mode="assign" binding="same">
+      <string>Source Han Sans CN</string>
+    </edit>
+  </match>
+  <match target="pattern">
+    <test qual="any" name="family">
+      <string>SimHei</string>
+    </test>
+    <edit name="family" mode="assign" binding="same">
+      <string>Source Han Sans CN</string>
+    </edit>
+  </match>
+  <match target="pattern">
+    <test qual="any" name="family">
+      <string>SimSun</string>
+    </test>
+    <edit name="family" mode="assign" binding="same">
+      <string>Source Han Serif CN</string>
+    </edit>
+  </match>
+  <match target="pattern">
+    <test qual="any" name="family">
+      <string>SimSun-18030</string>
+    </test>
+    <edit name="family" mode="assign" binding="same">
+      <string>Source Han Serif CN</string>
+    </edit>
+  </match>
+
+  <!-- Load local system customization file -->
+  <include ignore_missing="yes">conf.d</include>
+
+  <!-- Font cache directory list -->
+
+  <cachedir>/var/cache/fontconfig</cachedir>
+  <cachedir prefix="xdg">fontconfig</cachedir>
+  <!-- the following element will be removed in the future -->
+  <cachedir>~/.fontconfig</cachedir>
+
+  <config>
+    <!-- Rescan configuration every 30 seconds when FcFontSetList is called -->
+    <rescan>
+      <int>30</int>
+    </rescan>
+  </config>
+</fontconfig>
+```
+
 (未完待续)
