@@ -1,5 +1,5 @@
 ---
-title: ArchLinux折腾记录1-安装
+title: ArchLinux折腾记录01：安装
 description: 本系列用于聚合本人安装使用ArchLinux过程中遇到的一些问题。第一篇就从重新安装ArchLinux的记录开始。
 slug: id0032
 date: 2025-08-19 00:00:00+0000
