@@ -1,0 +1,761 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ArchLinux on Takuron</title><link>https://takuron.com/tags/archlinux/</link><description>Recent content in ArchLinux on Takuron</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Tue, 19 Aug 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://takuron.com/tags/archlinux/index.xml" rel="self" type="application/rss+xml"/><item><title>ArchLinux折腾记录01：安装</title><link>https://takuron.com/post/id0032/</link><pubDate>Tue, 19 Aug 2025 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0032/</guid><description>&lt;img src="https://img.takuron.com/blogpost/QHtj4iXrN6yjjmP6.webp" alt="Featured image of post ArchLinux折腾记录01：安装" />&lt;p>本系列用于聚合本人安装使用ArchLinux过程中遇到的一些问题。第一篇就从重新安装ArchLinux的记录开始，本人主要的安装过程请参考&lt;a class="link" href="https://arch.icekylin.online/" target="_blank" rel="noopener"
+>archlinux 简明指南&lt;/a>，本文也会以其的指导为基础主要列出一些本人的一些个性化配置。&lt;/p>
+&lt;h2 id="基础安装">基础安装
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="https://arch.icekylin.online/guide/rookie/basic-install" target="_blank" rel="noopener"
+>archlinux 基础安装 | archlinux 简明指南&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>基础安装部分其实没有什么个性化的内容。个人其实认为目前随着Windows的安全机制完善，双系统反而破坏了Windows的一些安全特性，故本人更建议直接全新安装。&lt;/p>
+&lt;h3 id="nvme硬盘的先进格式化与4kn模式">Nvme硬盘的先进格式化与4kn模式
+&lt;/h3>&lt;p>参考：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://wiki.archlinuxcn.org/wiki/%E5%85%88%E8%BF%9B%E6%A0%BC%E5%BC%8F%E5%8C%96" target="_blank" rel="noopener"
+>先进格式化 - Arch Linux 中文维基&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.zhihu.com/tardis/zm/art/355590811?source_id=1005" target="_blank" rel="noopener"
+>教你把 NVMe SSD 切换到原生4K模式 - 知乎&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>2025年的绝大多数Nvme硬盘和部分企业级机械硬盘已经使用了更先进的原生4K物理分区，但为了保证向下兼容性，几乎全部消费级的盘默认开启的都是模拟远古512b扇区的模式，这样理论上会产生逻辑扇区和物理扇区的对齐问题导致性能损失(不过实际对于消费级的低负载基本无影响)。 出于强迫症，既然正好要格式化硬盘就顺便把这个改了。&lt;/p>
+&lt;p>首先查看所有硬盘和分区：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl"># lsblk --fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME FSTYPE LABEL UUID MOUNTPOINT
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sda
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├─sda1 vfat C4DA-2C4D /boot
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├─sda2 swap 5b1564b2-2e2c-452c-bcfa-d1f572ae99f2 [SWAP]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">└─sda3 ext4 56adc99b-a61e-46af-aab7-a6d07e504652 /
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>选择需要的硬盘（nvme0n1为例），查找支持的格式化后逻辑块地址大小（Formatted Logical Block Address Size, FLBAS）。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl"># nvme id-ns -H /dev/nvme0n1 | grep &amp;#34;Relative Performance&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">LBA Format 0 : Metadata Size: 0 bytes - Data Size: 512 bytes - Relative Performance: 0x2 Good (in use)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">LBA Format 1 : Metadata Size: 0 bytes - Data Size: 4096 bytes - Relative Performance: 0x1 Better
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>找到可用的LBA Format后使用以下命令格式化并修改逻辑分区大小，其中-l是你选的对应模式：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">nvme format /dev/nvmeXn1 -l 1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="显卡驱动与桌面环境">显卡驱动与桌面环境
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="https://arch.icekylin.online/guide/rookie/graphic-driver.html" target="_blank" rel="noopener"
+>archlinux 显卡驱动 | archlinux 简明指南&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://arch.icekylin.online/guide/rookie/desktop-env-and-app.html" target="_blank" rel="noopener"
+>桌面环境与常用应用安装 | archlinux 简明指南&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>这里相比于原教程有比较大的出入，我使用的是Gnome作为默认桌面。Gnome对于高分缩放更加友好的同时界面比较好看，虽然Gnome的大而全完全就在ArchLinux的对立面，但给予用户选择大而全也是一种灵活自由吧。（跑&lt;/p>
+&lt;h3 id="软件安装的一些小调整">软件安装的一些小调整
+&lt;/h3>&lt;p>我将Aur管理的安装放到前面且改用了Paru，在启用archlinuxcn源后即可：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sudo pacman -S archlinuxcn-keyring
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo pacman -S paru
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>再就是中文字体的安装可以调的更前面一点来避免gnome和浏览器出现方框字：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sudo pacman -S adobe-source-han-serif-cn-fonts wqy-zenhei
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo pacman -S noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="gnome和中文输入法">Gnome和中文输入法
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://blog.skyone.dev/2023/archlinux-gnome/" target="_blank" rel="noopener"
+>ArchLinux安装GNOME桌面 - Skyone Blog&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.jianshu.com/p/9f5710d454b6" target="_blank" rel="noopener"
+>ArchLinux-GNOME的安装、配置和美化 - 简书&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>安装xorg&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sudo pacman -S xorg xorg-server xorg-xinit
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>安装gnome，其中gnome里面可以全装（你都选gnome了也不会太在乎这些基础功能是否精简干净了吧），但gnome-extra里面有大量没用的游戏、效率工具等内容，可以直接选择不装或者只挑有用的进行安装，一定一定要挑一下别学我直接一口气给我装了十个游戏。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sudo pacman -S gnome gnome-extra
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>然后打开gdm就可以显示图形界面了：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sudo systemctl enable --now gdm
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>安装完成后若在设置里面没有显示中文请确定按简明教程正确配置&lt;code>/etc/locale.gen&lt;/code>后执行：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sudo locale-gen
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>然后安装rime-ibus，选择ibus的原因是Gnome的窗口管理器基本和ibus输入引擎深度绑定，与其去折腾fctix的各种奇怪bug不如直接把朙月输入法的引擎引入ibus来的省心。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">sudo pacman -S ibus-rime
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo pacman librime-data-luna-pinyin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Gnome的ibus无法通过正常的&lt;code>ibus-setup&lt;/code>里的配置进行添加和编辑，也无法检查常规路径里面大的配置文件，且gnome输入法设置里的设置又少的可怜。以为ibus设置横向选词为例，根据&lt;a class="link" href="https://github.com/rime/ibus-rime/issues/52" target="_blank" rel="noopener"
+>这个帖子&lt;/a>，正确的Gnome配套的ibus配置文件位于:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">~/.config/ibus/rime/build/ibus_rime.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>打开这个文件后修改以下选项即可实现横向输入：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">style:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> horizontal: true
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="美化与完善">美化与完善
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="https://arch.icekylin.online/guide/advanced/optional-cfg-1.html" target="_blank" rel="noopener"
+>可选配置（基础篇） | archlinux 简明指南&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h3 id="语言与地区设置">语言与地区设置
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://wiki.archlinuxcn.org/wiki/%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%E6%9C%AC%E5%9C%B0%E5%8C%96" target="_blank" rel="noopener"
+>简体中文本地化 - Arch Linux 中文维基&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>我们按照以上教程先配置一个英文的全局local来防止tty中的中文渲染错误，修改&lt;code> /etc/locale.conf&lt;/code>：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">LANG=en_US.UTF-8
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>然后分别编辑以下文件：&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>~/.bashrc&lt;/code>&lt;/li>
+&lt;li>&lt;code>~/.xinitrc&lt;/code>&lt;/li>
+&lt;li>&lt;code>~/.xprofile&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;p>添加如下内容：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="k">export&lt;/span> &lt;span class="n">LANG&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">zh_CN&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">UTF&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">8&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">export&lt;/span> &lt;span class="n">LANGUAGE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">zh_CN&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">en_US&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="中文字体完善">中文字体完善
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://wiki.archlinuxcn.org/wiki/%E5%AD%97%E4%BD%93%E9%85%8D%E7%BD%AE" target="_blank" rel="noopener"
+>字体配置 - Arch Linux 中文维基&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://wiki.archlinuxcn.org/wiki/%E5%AD%97%E4%BD%93%E9%85%8D%E7%BD%AE/%E4%B8%AD%E6%96%87" target="_blank" rel="noopener"
+>字体配置/中文 - Arch Linux 中文维基&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>接下来我们修改一下字体的配置，让默认字体更接近Android原生的字体风格。首先下载我们需要的字体，这里等宽字体我选择了新的&lt;a class="link" href="https://github.com/subframe7536/Maple-font" target="_blank" rel="noopener"
+>Maple Mono&lt;/a>，其可以将中文设置成拉丁字母双倍宽度来实现中英混合的情况下的等宽，比强行压缩汉字的更纱黑体效果好太多。其中如果maple mono系列如果遇到需要选择的情况请选archlinuxcn源。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">paru -S ttf-roboto noto-fonts noto-fonts-cjk adobe-source-han-sans-cn-fonts adobe-source-han-serif-cn-fonts ttf-dejavu ttf-maplemono-nf-unhinted ttf-maplemono-nf-cn-unhinted
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>然后我们修改&lt;code>~/.config/fontconfig/fonts.conf&lt;/code>，以下是我根据配置建议写的Android字体配置，其中为了美观仍然选择的noto sans ckj sc为中文字体，并改用了maple系为等宽字体，这里也可以选择按上面网址里的配置修复Bug：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt"> 10
+&lt;/span>&lt;span class="lnt"> 11
+&lt;/span>&lt;span class="lnt"> 12
+&lt;/span>&lt;span class="lnt"> 13
+&lt;/span>&lt;span class="lnt"> 14
+&lt;/span>&lt;span class="lnt"> 15
+&lt;/span>&lt;span class="lnt"> 16
+&lt;/span>&lt;span class="lnt"> 17
+&lt;/span>&lt;span class="lnt"> 18
+&lt;/span>&lt;span class="lnt"> 19
+&lt;/span>&lt;span class="lnt"> 20
+&lt;/span>&lt;span class="lnt"> 21
+&lt;/span>&lt;span class="lnt"> 22
+&lt;/span>&lt;span class="lnt"> 23
+&lt;/span>&lt;span class="lnt"> 24
+&lt;/span>&lt;span class="lnt"> 25
+&lt;/span>&lt;span class="lnt"> 26
+&lt;/span>&lt;span class="lnt"> 27
+&lt;/span>&lt;span class="lnt"> 28
+&lt;/span>&lt;span class="lnt"> 29
+&lt;/span>&lt;span class="lnt"> 30
+&lt;/span>&lt;span class="lnt"> 31
+&lt;/span>&lt;span class="lnt"> 32
+&lt;/span>&lt;span class="lnt"> 33
+&lt;/span>&lt;span class="lnt"> 34
+&lt;/span>&lt;span class="lnt"> 35
+&lt;/span>&lt;span class="lnt"> 36
+&lt;/span>&lt;span class="lnt"> 37
+&lt;/span>&lt;span class="lnt"> 38
+&lt;/span>&lt;span class="lnt"> 39
+&lt;/span>&lt;span class="lnt"> 40
+&lt;/span>&lt;span class="lnt"> 41
+&lt;/span>&lt;span class="lnt"> 42
+&lt;/span>&lt;span class="lnt"> 43
+&lt;/span>&lt;span class="lnt"> 44
+&lt;/span>&lt;span class="lnt"> 45
+&lt;/span>&lt;span class="lnt"> 46
+&lt;/span>&lt;span class="lnt"> 47
+&lt;/span>&lt;span class="lnt"> 48
+&lt;/span>&lt;span class="lnt"> 49
+&lt;/span>&lt;span class="lnt"> 50
+&lt;/span>&lt;span class="lnt"> 51
+&lt;/span>&lt;span class="lnt"> 52
+&lt;/span>&lt;span class="lnt"> 53
+&lt;/span>&lt;span class="lnt"> 54
+&lt;/span>&lt;span class="lnt"> 55
+&lt;/span>&lt;span class="lnt"> 56
+&lt;/span>&lt;span class="lnt"> 57
+&lt;/span>&lt;span class="lnt"> 58
+&lt;/span>&lt;span class="lnt"> 59
+&lt;/span>&lt;span class="lnt"> 60
+&lt;/span>&lt;span class="lnt"> 61
+&lt;/span>&lt;span class="lnt"> 62
+&lt;/span>&lt;span class="lnt"> 63
+&lt;/span>&lt;span class="lnt"> 64
+&lt;/span>&lt;span class="lnt"> 65
+&lt;/span>&lt;span class="lnt"> 66
+&lt;/span>&lt;span class="lnt"> 67
+&lt;/span>&lt;span class="lnt"> 68
+&lt;/span>&lt;span class="lnt"> 69
+&lt;/span>&lt;span class="lnt"> 70
+&lt;/span>&lt;span class="lnt"> 71
+&lt;/span>&lt;span class="lnt"> 72
+&lt;/span>&lt;span class="lnt"> 73
+&lt;/span>&lt;span class="lnt"> 74
+&lt;/span>&lt;span class="lnt"> 75
+&lt;/span>&lt;span class="lnt"> 76
+&lt;/span>&lt;span class="lnt"> 77
+&lt;/span>&lt;span class="lnt"> 78
+&lt;/span>&lt;span class="lnt"> 79
+&lt;/span>&lt;span class="lnt"> 80
+&lt;/span>&lt;span class="lnt"> 81
+&lt;/span>&lt;span class="lnt"> 82
+&lt;/span>&lt;span class="lnt"> 83
+&lt;/span>&lt;span class="lnt"> 84
+&lt;/span>&lt;span class="lnt"> 85
+&lt;/span>&lt;span class="lnt"> 86
+&lt;/span>&lt;span class="lnt"> 87
+&lt;/span>&lt;span class="lnt"> 88
+&lt;/span>&lt;span class="lnt"> 89
+&lt;/span>&lt;span class="lnt"> 90
+&lt;/span>&lt;span class="lnt"> 91
+&lt;/span>&lt;span class="lnt"> 92
+&lt;/span>&lt;span class="lnt"> 93
+&lt;/span>&lt;span class="lnt"> 94
+&lt;/span>&lt;span class="lnt"> 95
+&lt;/span>&lt;span class="lnt"> 96
+&lt;/span>&lt;span class="lnt"> 97
+&lt;/span>&lt;span class="lnt"> 98
+&lt;/span>&lt;span class="lnt"> 99
+&lt;/span>&lt;span class="lnt">100
+&lt;/span>&lt;span class="lnt">101
+&lt;/span>&lt;span class="lnt">102
+&lt;/span>&lt;span class="lnt">103
+&lt;/span>&lt;span class="lnt">104
+&lt;/span>&lt;span class="lnt">105
+&lt;/span>&lt;span class="lnt">106
+&lt;/span>&lt;span class="lnt">107
+&lt;/span>&lt;span class="lnt">108
+&lt;/span>&lt;span class="lnt">109
+&lt;/span>&lt;span class="lnt">110
+&lt;/span>&lt;span class="lnt">111
+&lt;/span>&lt;span class="lnt">112
+&lt;/span>&lt;span class="lnt">113
+&lt;/span>&lt;span class="lnt">114
+&lt;/span>&lt;span class="lnt">115
+&lt;/span>&lt;span class="lnt">116
+&lt;/span>&lt;span class="lnt">117
+&lt;/span>&lt;span class="lnt">118
+&lt;/span>&lt;span class="lnt">119
+&lt;/span>&lt;span class="lnt">120
+&lt;/span>&lt;span class="lnt">121
+&lt;/span>&lt;span class="lnt">122
+&lt;/span>&lt;span class="lnt">123
+&lt;/span>&lt;span class="lnt">124
+&lt;/span>&lt;span class="lnt">125
+&lt;/span>&lt;span class="lnt">126
+&lt;/span>&lt;span class="lnt">127
+&lt;/span>&lt;span class="lnt">128
+&lt;/span>&lt;span class="lnt">129
+&lt;/span>&lt;span class="lnt">130
+&lt;/span>&lt;span class="lnt">131
+&lt;/span>&lt;span class="lnt">132
+&lt;/span>&lt;span class="lnt">133
+&lt;/span>&lt;span class="lnt">134
+&lt;/span>&lt;span class="lnt">135
+&lt;/span>&lt;span class="lnt">136
+&lt;/span>&lt;span class="lnt">137
+&lt;/span>&lt;span class="lnt">138
+&lt;/span>&lt;span class="lnt">139
+&lt;/span>&lt;span class="lnt">140
+&lt;/span>&lt;span class="lnt">141
+&lt;/span>&lt;span class="lnt">142
+&lt;/span>&lt;span class="lnt">143
+&lt;/span>&lt;span class="lnt">144
+&lt;/span>&lt;span class="lnt">145
+&lt;/span>&lt;span class="lnt">146
+&lt;/span>&lt;span class="lnt">147
+&lt;/span>&lt;span class="lnt">148
+&lt;/span>&lt;span class="lnt">149
+&lt;/span>&lt;span class="lnt">150
+&lt;/span>&lt;span class="lnt">151
+&lt;/span>&lt;span class="lnt">152
+&lt;/span>&lt;span class="lnt">153
+&lt;/span>&lt;span class="lnt">154
+&lt;/span>&lt;span class="lnt">155
+&lt;/span>&lt;span class="lnt">156
+&lt;/span>&lt;span class="lnt">157
+&lt;/span>&lt;span class="lnt">158
+&lt;/span>&lt;span class="lnt">159
+&lt;/span>&lt;span class="lnt">160
+&lt;/span>&lt;span class="lnt">161
+&lt;/span>&lt;span class="lnt">162
+&lt;/span>&lt;span class="lnt">163
+&lt;/span>&lt;span class="lnt">164
+&lt;/span>&lt;span class="lnt">165
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="err">?&lt;/span>&lt;span class="n">xml&lt;/span> &lt;span class="n">version&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;1.0&amp;#34;&lt;/span>&lt;span class="err">?&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;lt;!&lt;/span>&lt;span class="n">DOCTYPE&lt;/span> &lt;span class="n">fontconfig&lt;/span> &lt;span class="n">SYSTEM&lt;/span> &lt;span class="s2">&amp;#34;fonts.dtd&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">fontconfig&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">its&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">rules&lt;/span> &lt;span class="n">xmlns&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">its&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;http://www.w3.org/2005/11/its&amp;#34;&lt;/span> &lt;span class="n">version&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;1.0&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">its&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">translateRule&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">translate&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;no&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">selector&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;/fontconfig/*[not(self::description)]&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">its&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">rules&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">description&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Android&lt;/span> &lt;span class="ne">Font&lt;/span> &lt;span class="n">Config&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">description&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;!--&lt;/span> &lt;span class="ne">Font&lt;/span> &lt;span class="n">directory&lt;/span> &lt;span class="n">list&lt;/span> &lt;span class="o">--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">dir&lt;/span>&lt;span class="o">&amp;gt;/&lt;/span>&lt;span class="n">usr&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">share&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">fonts&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">dir&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">dir&lt;/span>&lt;span class="o">&amp;gt;/&lt;/span>&lt;span class="n">usr&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">local&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">share&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">fonts&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">dir&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">dir&lt;/span> &lt;span class="n">prefix&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;xdg&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">fonts&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">dir&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;!--&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">following&lt;/span> &lt;span class="n">element&lt;/span> &lt;span class="n">will&lt;/span> &lt;span class="n">be&lt;/span> &lt;span class="n">removed&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">future&lt;/span> &lt;span class="o">--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">dir&lt;/span>&lt;span class="o">&amp;gt;~/.&lt;/span>&lt;span class="n">fonts&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">dir&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;!--&lt;/span> &lt;span class="err">关闭内嵌点阵字体&lt;/span> &lt;span class="o">--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">match&lt;/span> &lt;span class="n">target&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;font&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">edit&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;embeddedbitmap&amp;#34;&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;assign&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="ne">bool&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="bp">false&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="ne">bool&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">edit&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;!--&lt;/span> &lt;span class="err">英文默认字体使用&lt;/span> &lt;span class="n">Roboto&lt;/span> &lt;span class="err">和&lt;/span> &lt;span class="n">Noto&lt;/span> &lt;span class="n">Serif&lt;/span> &lt;span class="p">,&lt;/span>&lt;span class="err">终端使用&lt;/span> &lt;span class="n">Maple&lt;/span> &lt;span class="n">Mono&lt;/span> &lt;span class="n">NF&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="err">。&lt;/span>&lt;span class="o">--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">qual&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;any&amp;#34;&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">serif&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">edit&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;prepend&amp;#34;&lt;/span> &lt;span class="n">binding&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;strong&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Noto&lt;/span> &lt;span class="n">Serif&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">edit&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">match&lt;/span> &lt;span class="n">target&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">qual&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;any&amp;#34;&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">sans&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">serif&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">edit&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;prepend&amp;#34;&lt;/span> &lt;span class="n">binding&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;strong&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Roboto&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">edit&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">match&lt;/span> &lt;span class="n">target&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">qual&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;any&amp;#34;&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">monospace&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">edit&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;prepend&amp;#34;&lt;/span> &lt;span class="n">binding&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;strong&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Maple&lt;/span> &lt;span class="n">Mono&lt;/span> &lt;span class="n">NF&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">edit&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;!--&lt;/span> &lt;span class="err">中文默认字体使用&lt;/span>　&lt;span class="n">Noto&lt;/span> &lt;span class="n">Sans&lt;/span> &lt;span class="n">CJK&lt;/span> &lt;span class="n">SC&lt;/span> &lt;span class="p">,&lt;/span>&lt;span class="err">终端使用&lt;/span> &lt;span class="n">Maple&lt;/span> &lt;span class="n">Mono&lt;/span> &lt;span class="n">NF&lt;/span> &lt;span class="n">CN&lt;/span>&lt;span class="err">。&lt;/span>&lt;span class="o">--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;lang&amp;#34;&lt;/span> &lt;span class="n">compare&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;contains&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">zh&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">serif&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">edit&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;prepend&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Noto&lt;/span> &lt;span class="n">Serif&lt;/span> &lt;span class="n">CJK&lt;/span> &lt;span class="n">SC&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">edit&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;lang&amp;#34;&lt;/span> &lt;span class="n">compare&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;contains&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">zh&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">sans&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">serif&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">edit&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;prepend&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Noto&lt;/span> &lt;span class="n">Sans&lt;/span> &lt;span class="n">CJK&lt;/span> &lt;span class="n">SC&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">edit&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;lang&amp;#34;&lt;/span> &lt;span class="n">compare&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;contains&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">zh&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">monospace&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">edit&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;prepend&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Maple&lt;/span> &lt;span class="n">Mono&lt;/span> &lt;span class="n">NF&lt;/span> &lt;span class="n">CN&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">edit&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;!--&lt;/span> &lt;span class="n">Windows&lt;/span> &lt;span class="o">&amp;amp;&lt;/span> &lt;span class="n">Linux&lt;/span> &lt;span class="n">Chinese&lt;/span> &lt;span class="n">fonts&lt;/span>&lt;span class="o">.&lt;/span> &lt;span class="o">--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;!--&lt;/span> &lt;span class="err">把所有常见的中文字体映射到思源黑体和思源宋体，这样当这些字体未安装时会使用思源黑体和思源宋体&lt;/span>&lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">解决特定程序指定使用某字体，并且在字体不存在情况下不会使用&lt;/span>&lt;span class="n">fallback字体导致中文显示不正常的情况&lt;/span>&lt;span class="o">.&lt;/span> &lt;span class="o">--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">match&lt;/span> &lt;span class="n">target&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">qual&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;any&amp;#34;&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">WenQuanYi&lt;/span> &lt;span class="n">Zen&lt;/span> &lt;span class="n">Hei&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">edit&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;assign&amp;#34;&lt;/span> &lt;span class="n">binding&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;same&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Source&lt;/span> &lt;span class="n">Han&lt;/span> &lt;span class="n">Sans&lt;/span> &lt;span class="n">CN&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">edit&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">match&lt;/span> &lt;span class="n">target&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">qual&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;any&amp;#34;&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">WenQuanYi&lt;/span> &lt;span class="n">Micro&lt;/span> &lt;span class="n">Hei&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">edit&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;assign&amp;#34;&lt;/span> &lt;span class="n">binding&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;same&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Source&lt;/span> &lt;span class="n">Han&lt;/span> &lt;span class="n">Sans&lt;/span> &lt;span class="n">CN&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">edit&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">match&lt;/span> &lt;span class="n">target&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">qual&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;any&amp;#34;&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">WenQuanYi&lt;/span> &lt;span class="n">Micro&lt;/span> &lt;span class="n">Hei&lt;/span> &lt;span class="ne">Light&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">edit&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;assign&amp;#34;&lt;/span> &lt;span class="n">binding&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;same&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Source&lt;/span> &lt;span class="n">Han&lt;/span> &lt;span class="n">Sans&lt;/span> &lt;span class="n">CN&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">edit&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">match&lt;/span> &lt;span class="n">target&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">qual&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;any&amp;#34;&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Microsoft&lt;/span> &lt;span class="n">YaHei&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">edit&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;assign&amp;#34;&lt;/span> &lt;span class="n">binding&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;same&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Source&lt;/span> &lt;span class="n">Han&lt;/span> &lt;span class="n">Sans&lt;/span> &lt;span class="n">CN&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">edit&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">match&lt;/span> &lt;span class="n">target&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">qual&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;any&amp;#34;&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">SimHei&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">edit&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;assign&amp;#34;&lt;/span> &lt;span class="n">binding&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;same&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Source&lt;/span> &lt;span class="n">Han&lt;/span> &lt;span class="n">Sans&lt;/span> &lt;span class="n">CN&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">edit&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">match&lt;/span> &lt;span class="n">target&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">qual&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;any&amp;#34;&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">SimSun&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">edit&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;assign&amp;#34;&lt;/span> &lt;span class="n">binding&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;same&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Source&lt;/span> &lt;span class="n">Han&lt;/span> &lt;span class="n">Serif&lt;/span> &lt;span class="n">CN&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">edit&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">match&lt;/span> &lt;span class="n">target&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;pattern&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">test&lt;/span> &lt;span class="n">qual&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;any&amp;#34;&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">SimSun&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">18030&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">edit&lt;/span> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;family&amp;#34;&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;assign&amp;#34;&lt;/span> &lt;span class="n">binding&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;same&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">Source&lt;/span> &lt;span class="n">Han&lt;/span> &lt;span class="n">Serif&lt;/span> &lt;span class="n">CN&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">edit&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">match&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;!--&lt;/span> &lt;span class="n">Load&lt;/span> &lt;span class="n">local&lt;/span> &lt;span class="n">system&lt;/span> &lt;span class="n">customization&lt;/span> &lt;span class="n">file&lt;/span> &lt;span class="o">--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">include&lt;/span> &lt;span class="n">ignore_missing&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;yes&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">conf&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">include&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;!--&lt;/span> &lt;span class="ne">Font&lt;/span> &lt;span class="n">cache&lt;/span> &lt;span class="n">directory&lt;/span> &lt;span class="n">list&lt;/span> &lt;span class="o">--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">cachedir&lt;/span>&lt;span class="o">&amp;gt;/&lt;/span>&lt;span class="k">var&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">cache&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">fontconfig&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">cachedir&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">cachedir&lt;/span> &lt;span class="n">prefix&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;xdg&amp;#34;&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="n">fontconfig&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">cachedir&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;!--&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">following&lt;/span> &lt;span class="n">element&lt;/span> &lt;span class="n">will&lt;/span> &lt;span class="n">be&lt;/span> &lt;span class="n">removed&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">the&lt;/span> &lt;span class="n">future&lt;/span> &lt;span class="o">--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">cachedir&lt;/span>&lt;span class="o">&amp;gt;~/.&lt;/span>&lt;span class="n">fontconfig&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">cachedir&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;!--&lt;/span> &lt;span class="n">Rescan&lt;/span> &lt;span class="n">configuration&lt;/span> &lt;span class="n">every&lt;/span> &lt;span class="mi">30&lt;/span> &lt;span class="n">seconds&lt;/span> &lt;span class="n">when&lt;/span> &lt;span class="n">FcFontSetList&lt;/span> &lt;span class="n">is&lt;/span> &lt;span class="n">called&lt;/span> &lt;span class="o">--&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">rescan&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="ne">int&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="mi">30&lt;/span>&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="ne">int&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">rescan&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;lt;/&lt;/span>&lt;span class="n">fontconfig&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="tcp调参">TCP调参
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.omnitt.com/" target="_blank" rel="noopener"
+>TCP 迷之调参 - 智能网络优化工具&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>估计玩过VPS的都多少了解过TCP调参这个事情吧。虽然大多数在服务器上可以有效提高吞吐量的设置在终端设备上就是浪费内存浪费电，但有些算法类的调整（例如bbr拥塞控制）还是能有效提高设备网络性能的。&lt;/p>
+&lt;p>为&lt;code>/etc/sysctl.conf&lt;/code>文件添加如下内容，主要是改变队列管理和拥塞控制算法其他都可动可不动：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl"># --- 笔记本网络与系统优化 ---
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 使用现代队列管理算法，对抗缓冲区膨胀，降低延迟
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">net.core.default_qdisc = cake
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 启用 BBR 拥塞控制算法以提升速度和吞吐量
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">net.ipv4.tcp_congestion_control = bbr
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 启用 TCP Fast Open 减少连接延迟
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">net.ipv4.tcp_fastopen = 3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 允许重用 TIME_WAIT 状态的连接
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">net.ipv4.tcp_tw_reuse = 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"># 连接空闲后更快地恢复传输速度
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">net.ipv4.tcp_slow_start_after_idle = 0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="gnome插件推荐">Gnome插件推荐
+&lt;/h3>&lt;p>为了给gnome安装插件，首先需要安装gnome-shell-extensions和gnome-browser-connector，如果仍然无法安装请再安装对应浏览器里的插件。（和其他发行版不同&lt;strong>不需要安装chrome-gnome-shell&lt;/strong>）&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">paru -S gnome-shell-extensions gnome-browser-connector
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>以下是本人在用的一些插件：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://extensions.gnome.org/extension/615/appindicator-support/" target="_blank" rel="noopener"
+>AppIndicator and KStatusNotifierItem Support &lt;/a>：恢复被gnome取消的托盘&lt;/li>
+&lt;li>&lt;a class="link" href="https://extensions.gnome.org/extension/1460/vitals/" target="_blank" rel="noopener"
+>Vitals&lt;/a>: 清爽的硬件监控&lt;/li>
+&lt;/ul>
+&lt;h2 id="常用软件">常用软件
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="https://arch.icekylin.online/guide/advanced/system-ctl.html" target="_blank" rel="noopener"
+>Linux 日常操作与基础知识 | archlinux 简明指南&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h3 id="防火墙">防火墙
+&lt;/h3>&lt;p>按照个人使用习惯安装ufw防火墙和其gui版本gufw并启动：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">paru -S ufw gufw
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl enable --now ufw.service
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo ufw enable
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这个防火墙不用我多介绍了吧无论cli还是衍生的gui都是最简单的那一类了。注意放行一些类似LocalSend之类的传入请求即可，大多数时候拒绝入站能根本上解决一些公共网络中的安全问题。&lt;/p>
+&lt;h3 id="java环境">Java环境
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://wiki.archlinuxcn.org/wiki/Java" target="_blank" rel="noopener"
+>Java - Arch Linux 中文维基&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>ArchLinux的Java充分考虑了Java生态碎片化的情况，准备了 java-runtime-common和java-environment-common包作为系统的Java环境管理工具，使得开发者可以在命令行切换目前使用的Java版本。&lt;/p>
+&lt;p>我们先安装一个21版本的OpenJDK&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">paru -S jdk21-openjdk
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>此时可以看到java-runtime-common也被作为依赖安装到了设备上，我们用命令查看一下目前支持的java环境：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl"># archlinux-java status
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Available Java environments:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> java-21-openjdk (default)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>可以看到我们所有的java环境和目前启动Java程序所使用的默认Java路径，后续我们只需要用：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">archlinux-java set &amp;lt;JAVA_ENV_NAME&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>就可以切换目前使用的Java环境了。&lt;/p>
+&lt;h3 id="intellij-idea系ide的安装">intellij-idea系IDE的安装
+&lt;/h3>&lt;p>我们可以在AUR里安装几乎全部的jetbrain公司的产品，但是安装后直接点击桌面图标是无法启动的（演示以webstorm为例）：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">paru -S webstorm
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>此时&lt;strong>在电脑中已有Java环境的情况下&lt;/strong>前往安装目录寻找启动脚本并执行。该脚本可以在没有jetbarin的jre的情况下用默认Java环境打开对应IDE。&lt;/p>
+&lt;p>完成初始化后，我们在主菜单使用&lt;code>Ctrl + Shift + A&lt;/code>快捷键搜索&lt;code>选择IDE的启动Java运行时&lt;/code>（中文）或者&lt;code>Choose Boot Java Runtime for the IDE&lt;/code>（英文），在新建里面随便下载一个（首次安装）/选择上一个IDE已经下载好的路径即可。&lt;/p>
+&lt;p>&lt;img src="https://img.takuron.com/blogpost/Wzc2CbXeL8LBjczL.webp"
+loading="lazy"
+alt="选择Java运行环境"
+>&lt;/p>
+&lt;h3 id="其他常用软件">其他常用软件
+&lt;/h3>&lt;ul>
+&lt;li>视频：Vlc播放器 &lt;code>paru -S vlc vlc-plugins-all&lt;/code>&lt;/li>
+&lt;li>图形化文本编辑器：Visual Studio Code &lt;code>paru -S code&lt;/code>&lt;/li>
+&lt;li>办公三件套：LibreOffice &lt;code>paru -S libreoffice-fresh libreoffice-fresh-zh-cn&lt;/code> 或者 &lt;code>paru -S libreoffice-still libreoffice-still-zh-cn&lt;/code>&lt;/li>
+&lt;li>录屏/直播：OBS &lt;code>paru -S obs-studio&lt;/code>&lt;/li>
+&lt;/ul></description></item><item><title>关于我AUR无法更新最终定位到git代理设置的事情</title><link>https://takuron.com/post/id0030/</link><pubDate>Sun, 06 Apr 2025 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0030/</guid><description>&lt;img src="https://img.takuron.com/blogpost/zvl9yfrxzfmh.webp" alt="Featured image of post 关于我AUR无法更新最终定位到git代理设置的事情" />&lt;p>在之前使用Paru更新的时候遇到任何网络连接问题我都直接开开开全局劫持代理就完事了。这次是由于我自己用的小猫咪版本更新导致TUN模式的系统服务老是有问题无法使用才发现的一个错误，我在使用paru更新AUR的PKGBUILD时候爆出了这样的错误：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">致命错误：无法访问 &amp;#39;https://aur.archlinux.org/vscodium-bin&amp;#39;：TLS connect error: error:00000000:lib(0)::reason(0)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>首先还是系统代理开开开，看到仍然报错后还怀疑过paru无法正常读取自动设置的系统代理故而尝试手动设置命令行代理/尝试更换yay更新均无效。仍然同样报错，一度怀疑系统时间和本地证书问题，百思不得其解。&lt;/p>
+&lt;p>思索的时候重新审视报错日志发现卡在的位置实际是从aur.archlinux.org克隆PKGBUILD的时候，这个过程正常是使用git的，实际报错的为如下指令：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">git clone --no-progress -- https://aur.archlinux.org/vscodium-bin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如果使用git那我给git手动设置了代理服务器，这样就能解释的通为什么错误不会因系统代理而变化，重新审视了我的git的配置文件（~/.gitconfig ）：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[http]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy = socks5://127.0.0.1:7897
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[https]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy = socks5://127.0.0.1:7897
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>仍然没有问题，尝试验证性的从github克隆库没有问题，再尝试用设置同样代理的Firefox打开aur.archlinux.org网站也没有问题。也就是说问题准确定位是&lt;strong>git无法在通过代理的情况下验证特定网站（aur.archlinux.org）的TLS证书&lt;/strong>？&lt;/p>
+&lt;p>&lt;img src="https://img.takuron.com/blogpost/80a7c383d3c7a3fb47d28c89aad71f64_MD5-tuya.webp"
+loading="lazy"
+alt="?"
+>&lt;/p>
+&lt;p>重新以git代理\TLS错误联合aur等关键词搜索，看到了&lt;a class="link" href="https://www.cnblogs.com/searchstar/p/18437537" target="_blank" rel="noopener"
+>在与clash配合使用的情况下有些机器在git使用socks5代理会存在问题&lt;/a>，故尝试&lt;strong>将代理改为http&lt;/strong>，修好了：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[http]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy = http://127.0.0.1:7897
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[https]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy = http://127.0.0.1:7897
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://img.takuron.com/blogpost/80a7c383d3c7a3fb47d28c89aad71f64_MD5-tuya.webp"
+loading="lazy"
+alt="?"
+>&lt;/p></description></item></channel></rss>
