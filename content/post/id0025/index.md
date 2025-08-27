@@ -3,7 +3,7 @@ title: Android 13中使用Intent传输Parcelable对象为空的解决方式
 description: Android13系统对API 33中新方法getParcelable方法的处理有问题，在使用Gradle 8.0以上版本进行混淆后会导致对象无法处理，这是一个bug，可以使用BundleCompat.getParcelable方法替代来解决问题。
 slug: id0025
 date: 2023-11-23 00:00:00+0000
-image: https://s2.loli.net/2023/11/23/Lb2Ch7DxI5gGAX3.webp
+image: https://img.takuron.com/20250827/1e7bc2d1c52123042ccb528e7263e7ca.webp
 categories:
   - Android开发
 tags:

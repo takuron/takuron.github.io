@@ -3,7 +3,7 @@ title: 为Windows11设置更多DNS over https服务器&一键添加更多服务�
 description: 这篇文章讲述如何在Windows 10/11/Server 2022上开启系统级的DNS over Https (DoH) 功能。文章详细介绍了设置步骤，并提供了添加阿里、DNSPOD等国内常用DoH服务器的方法及实用脚本，让你轻松用上更安全的加密DNS服务！
 slug: id0024
 date: 2021-10-05 00:00:00+0000
-image: https://i.loli.net/2021/10/05/tGsYPkD8A1wgXWe.jpg
+image: https://img.takuron.com/20250827/ed8fda4fbfdea13178ac39ef421b2ebb.jpg
 categories:
   - Windows
 tags:
@@ -22,16 +22,16 @@ weight: 1       # You can add weight to some posts to override the default sorti
 
 以WLAN网络为例：打开设置-WLAN-**硬件属性**-DNS服务器分配，选择手动。输入一个支持DoH的服务商的DNS地址（例如Google的8.8.8.8），下面灰显的选项就会启用：
 
-![Snipaste_2021-10-05_14-20-37.png](https://i.loli.net/2021/10/05/ZqRehrx8wHB7fVP.png)
+![Snipaste_2021-10-05_14-20-37.png](https://img.takuron.com/20250827/19ab4d119bcd75a81aa2cf5d404cffc6.png)
 
-![Snipaste_2021-10-05_14-19-54.png](https://i.loli.net/2021/10/05/Q8FMXhaOrW2AGUc.png)
+![Snipaste_2021-10-05_14-19-54.png](https://img.takuron.com/20250827/53f7b46711870002bf18aa4c337fb20f.png)
 
 > 2021.10.29 这不是一个BUG，这里设置的话可以自动覆盖所有将要连接的WIFI，更好的保护连接公共WIFI带来的隐私问题。
 > <s>2021.10.5 你可以在选择网络连接的位置发现同样的选项来设置网络连接的属性，但是不能启用DoH，本文来自Takuron点top，这应该是Windows11的一个BUG。</s>
 
 不过我们的设置并没有结束，**坑爹的微软只预置了一些常见的全球DoH服务器，但众所周知天朝不在地球上**。设置其他服务器不会有任何显示：
 
-![Snipaste_2021-10-05_13-43-47.png](https://i.loli.net/2021/10/05/pBGO1Qjt54uMFNT.png)
+![Snipaste_2021-10-05_13-43-47.png](https://img.takuron.com/20250827/06670b3bfb0f38aaaeca8a6af77f72b8.png)
 
 你只能直接设置以下DoH服务器：
 
@@ -69,4 +69,4 @@ IPV6同理，不过DoH服务商那么多，还要连着主要次要ipv4/v6都要
 
 可以看到添加后就能正常使用国内的DoH服务了。
 
-![Snipaste_2021-10-05_13-45-26.png](https://i.loli.net/2021/10/05/jTmHQ82Sunv5Ahb.png)
+![Snipaste_2021-10-05_13-45-26.png](https://img.takuron.com/20250827/a06762e22f8c2ba77b4d642eaa0bd5a0.png)
