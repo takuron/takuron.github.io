@@ -3,7 +3,7 @@ title: ArchLinux折腾记录01：安装
 description: 本系列用于聚合本人安装使用ArchLinux过程中遇到的一些问题。第一篇就从重新安装ArchLinux的记录开始。
 slug: id0032
 date: 2025-08-19 00:00:00+0000
-image: https://img.takuron.com/blogpost/QHtj4iXrN6yjjmP6.webp
+image: https://img.takuron.com/20250827/fd891f4ceba3bd23434784b7077c9044.webp
 categories:
   - ArchLinux
 tags:
@@ -436,7 +436,7 @@ paru -S webstorm
 
 完成初始化后，我们在主菜单使用``Ctrl + Shift + A``快捷键搜索``选择IDE的启动Java运行时``（中文）或者``Choose Boot Java Runtime for the IDE``（英文），在新建里面随便下载一个（首次安装）/选择上一个IDE已经下载好的路径即可。
 
-![选择Java运行环境](https://img.takuron.com/blogpost/Wzc2CbXeL8LBjczL.webp)
+![选择Java运行环境](https://img.takuron.com/20250827/b3e0b010d074154b6e4695439b86b3b0.webp)
 
 ### 其他常用软件
 
