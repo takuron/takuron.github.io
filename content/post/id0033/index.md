@@ -1,6 +1,6 @@
 ---
 title: 个人软件开发记录01：密码派生工具AegixPass
-description: 此文用于介绍一个密码派生工具AegixPass的设计开发。
+description: 摒弃 MD5 与旧时代设计，基于 Argon2id 和 ChaCha20 构建的确定性密码派生工具，以及在 LLM 辅助下的全栈开发复盘。
 slug: id0033
 date: 2025-11-24 00:00:00+0000
 image: https://img.takuron.com/20251124/166cc411d9998f24dfa03994a4e05a2e.webp
