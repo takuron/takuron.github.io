@@ -1,7 +1,7 @@
 ---
 title: ArchLinux折腾记录02：使用问题合集
 description: 记录ArchLinux使用过程中遇到的小问题和解决方案。
-slug: id0033
+slug: id0034
 date: 2025-11-29 00:00:00+0000
 image: https://img.takuron.com/20250827/fd891f4ceba3bd23434784b7077c9044.webp
 categories:
