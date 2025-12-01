@@ -1,6 +1,6 @@
 ---
 title: 2025年将Windows10 LTSC压缩来实现DVD单盘刻录
-description: 记录ArchLinux使用过程中遇到的小问题和解决方案。
+description: 针对Windows 10 LTSC 2021镜像体积超过普通DVD容量的问题，本文详细记录了如何使用DISM命令将install.wim压缩为install.esd，成功将ISO体积缩减并实现单盘刻录的完整步骤。
 slug: id0035
 date: 2025-12-01 00:00:00+0000
 image: https://img.takuron.com/20251201/4925728ab6c82e56bd49659f7e013dde.webp
