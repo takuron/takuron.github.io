@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DNS Over Https on Takuron</title><link>https://takuron.com/tags/dns-over-https/</link><description>Recent content in DNS Over Https on Takuron</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Tue, 05 Oct 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://takuron.com/tags/dns-over-https/index.xml" rel="self" type="application/rss+xml"/><item><title>为Windows11设置更多DNS over https服务器&amp;一键添加更多服务器脚本</title><link>https://takuron.com/post/id0024/</link><pubDate>Tue, 05 Oct 2021 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0024/</guid><description>&lt;img src="https://img.takuron.com/20250827/ed8fda4fbfdea13178ac39ef421b2ebb.jpg" alt="Featured image of post 为Windows11设置更多DNS over https服务器&amp;一键添加更多服务器脚本" /&gt;&lt;p&gt;早就有闻Windows系统已经添加了系统级的DNS over Https的支持，趁着此次重装Windows11新系统之际换掉AdguardHome改用Windows系统自己提供的DoH支持。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;理论上Windows 10 build 19628以后的所有版本都支持此教程的方法，本人也亲测在Windows Server 2022上成功使用。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id="设置dns-over-https的位置"&gt;设置DNS over Https的位置
+&lt;/h2&gt;&lt;p&gt;以WLAN网络为例：打开设置-WLAN-&lt;strong&gt;硬件属性&lt;/strong&gt;-DNS服务器分配，选择手动。输入一个支持DoH的服务商的DNS地址（例如Google的8.8.8.8），下面灰显的选项就会启用：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/20250827/19ab4d119bcd75a81aa2cf5d404cffc6.png"
+loading="lazy"
+alt="Snipaste_2021-10-05_14-20-37.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/20250827/53f7b46711870002bf18aa4c337fb20f.png"
+loading="lazy"
+alt="Snipaste_2021-10-05_14-19-54.png"
+&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;2021.10.29 这不是一个BUG，这里设置的话可以自动覆盖所有将要连接的WIFI，更好的保护连接公共WIFI带来的隐私问题。
+&lt;s&gt;2021.10.5 你可以在选择网络连接的位置发现同样的选项来设置网络连接的属性，但是不能启用DoH，本文来自Takuron点top，这应该是Windows11的一个BUG。&lt;/s&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;不过我们的设置并没有结束，&lt;strong&gt;坑爹的微软只预置了一些常见的全球DoH服务器，但众所周知天朝不在地球上&lt;/strong&gt;。设置其他服务器不会有任何显示：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/20250827/06670b3bfb0f38aaaeca8a6af77f72b8.png"
+loading="lazy"
+alt="Snipaste_2021-10-05_13-43-47.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;你只能直接设置以下DoH服务器：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Cloudflare(1.1.1.1/2606:4700:4700::1111)&lt;/li&gt;
+&lt;li&gt;Google(8.8.8.8/2001:4860:4860::8888)&lt;/li&gt;
+&lt;li&gt;Quad9(9.9.9.9/2620:fe::fe)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如果需要安装国内常用的DoH服务器需要先添加&lt;/p&gt;
+&lt;h2 id="为系统添加更多dns-over-https服务器"&gt;为系统添加更多DNS over Https服务器
+&lt;/h2&gt;&lt;p&gt;我们需要注册更多的Doh服务器，这可以用以下命令解决（感谢&lt;a class="link" href="https://bbs.pcbeta.com/viewthread-1877659-1-1.html" target="_blank" rel="noopener"
+&gt;如何在win10中自定义doh服务器-远景论坛-微软极客社区&lt;/a&gt;：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;netsh dns add encryption server=&amp;lt;your-server&amp;#39;s-IP-address&amp;gt; dohtemplate=&amp;lt;your-server&amp;#39;s-DoH-URI-template&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;netsh dns show encryption server=&amp;lt;your-server&amp;#39;s-IP-address&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;例如添加阿里的DoH代码：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;netsh dns add encryption server=223.5.5.5 dohtemplate=https://dns.alidns.com/dns-query
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;netsh dns show encryption server=223.5.5.5
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;IPV6同理，不过DoH服务商那么多，还要连着主要次要ipv4/v6都要添加，怕不是一行行打手都麻了，为此我专门写了一个脚本，自动添加了以下DoH服务商：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;阿里DNS(223.5.5.5/2400:3200::1)&lt;/li&gt;
+&lt;li&gt;DNSPOD(119.29.29.29/2402:4e00::)&lt;/li&gt;
+&lt;li&gt;深信服下一代网络工程IPV6 DoH(仅IPV6:240C::6666)&lt;/li&gt;
+&lt;li&gt;360(仅IPV4:101.226.4.6/123.125.81.6)&lt;/li&gt;
+&lt;li&gt;Adguard(包括多种，&lt;a class="link" href="https://bbs.pcbeta.com/viewthread-1877659-1-1.html" target="_blank" rel="noopener"
+&gt;详细官网查看&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;下载后&lt;strong&gt;请使用右击，以管理员权限运行&lt;/strong&gt;,&lt;a class="link" href="https://takuron.lanzoui.com/b0as59z2f" target="_blank" rel="noopener"
+&gt;蓝奏云下载地址（提取码h6e1）&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;可以看到添加后就能正常使用国内的DoH服务了。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/20250827/a06762e22f8c2ba77b4d642eaa0bd5a0.png"
+loading="lazy"
+alt="Snipaste_2021-10-05_13-45-26.png"
+&gt;&lt;/p&gt;</description></item><item><title>以最简单的方式改进自己电脑的DNS</title><link>https://takuron.com/post/id0019/</link><pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0019/</guid><description>&lt;img src="https://i.loli.net/2020/05/10/VnFD2HCmewfQuY4.jpg" alt="Featured image of post 以最简单的方式改进自己电脑的DNS" /&gt;&lt;p&gt;以今天的标准来看，1997年互联网上的信息获取是十分低效的。搜索引擎刚刚起步，网站数目少，甚至在网上发布信息的人都寥寥无几，且当年的信息传递方法绝大多数已经被淘汰。而身处2020年的我们，为什么比以前更需要来自上个世纪的RSS了呢？&lt;/p&gt;
+&lt;h3 id="主流信息获取的问题"&gt;主流信息获取的问题
+&lt;/h3&gt;&lt;p&gt;说到信息获取，很多人首先会想到网页。的确现代网页能够完成对各种信息的精确表达，但人们会忽视一个关键点，那就是&lt;strong&gt;在信息爆炸的时代，我们更需要将自己有限的时间留给获取信息本身&lt;/strong&gt;，而这在2020年的网页里面，在很多时候，我们仍然做不到：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/05/22/Cp18K5H9eshiumF.jpg"
+loading="lazy"
+alt="Snipaste_2020-05-22_11-39-38-jpg.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;是的，他们不仅是添加广告，他们还会用要素过多的页面元素来影响你信息的获取，你需要拨开层层遮罩才能看到你需要的信息。如果你使用的是手机，那么恭喜你，你可能连网页都打不开，因为.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/05/22/MjiurcRlSeX1B4J.jpg"
+loading="lazy"
+alt="photo_2020-05-22_18-14-30.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;然后就是：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/05/22/BbJusGERrPqQanU.jpg"
+loading="lazy"
+alt="photo_2020-05-22_18-16-58.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;流量至上的时代，每个平台都试图在圈地运动中试图把用户困在自己的小圈子里面，像填鸭一样推送着自己想让用户知道的信息，并且&lt;strong&gt;这些信息就和骚扰电话一样是主动式的&lt;/strong&gt;，处理信息变成了被信息“填鸭”是现在许多互联网用户的悲哀。&lt;/p&gt;
+&lt;p&gt;这也引申出第二个问题，在APP里面浏览会留下记录。在经过分析和在各个应用肮脏的py交易中随意交易后我们的隐私荡然无存，最后变成让人可怕的服务推荐。就我个人而言，我希望保持“高冷”，&lt;strong&gt;不希望在我的信息浏览中留下任何关于我的喜好的信息交给互联网公司随意分析&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;最后，目前的推送系统大多数是“正反馈”的：用户喜欢看什么、就给用户推送什么以此一步步给用户打上标签。但我们常说兼听则明和忠言逆耳，&lt;strong&gt;真正客观的信息难以从讨好你的推荐算法中获取&lt;/strong&gt;，这也一定程度上促进了目前互联网ETC横飞，网络战争日日不休。&lt;/p&gt;
+&lt;h3 id="rss的优势"&gt;RSS的优势
+&lt;/h3&gt;&lt;p&gt;RSS(Really Simple Syndication)是一种描述和同步网站内容的格式，是使用最广泛的XML应用。简单来说就是：将信息以约定的格式传递给用户，然后用户通过其他软件解析并且阅读。除了最简单的排版格式以外几乎没有其他内容的RSS在10年前都会被称为鸡肋，但现在看来，它一口气解决了几乎所有上述痛点。&lt;/p&gt;
+&lt;p&gt;首先由于只有基本的排版元素，所以实际呈现给用户的内容基本靠第三方软件完成解析，并且一个合适的第三方软件可以简明高效的显示多个来源的信息而不必看乱七八糟的广告和适应各个网页的排版，&lt;strong&gt;让你不必在乎网页和APP的差异而关注信息本身&lt;/strong&gt;。另外由于你的信息是一次性拉取的，网站无法得到你的阅读反馈，自然也就&lt;strong&gt;无法对你关注的点进行分析&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;而且大多数网站的RSS都是提供的首页订阅，也就是仅仅按照热度和时间顺序给你推送，任何人都会拿到一模一样的信息，&lt;strong&gt;你得到的信息更加客观而不会局限于你的偏好导致的推荐信息失真&lt;/strong&gt;。最后，除了一些设置自动更新的软件会主动推送外，&lt;strong&gt;一般情况下RSS的刷新是被动的&lt;/strong&gt;，也就是说是你阅读的信息而不是信息让你阅读，这才是一种良性的信息获取。&lt;/p&gt;
+&lt;p&gt;有人要说了，如果我希望得到一些个性的的信息呢？一些第三方平台例如Inoreader可以提供订阅源的筛选服务，可以按照你规定的规则对信息进行初筛，提高你的信息获取效率。&lt;/p&gt;
+&lt;h3 id="那你能帮帮我吗"&gt;那你能帮帮我吗？
+&lt;/h3&gt;&lt;p&gt;这里推荐&lt;a class="link" href="https://sspai.com/post/56391" target="_blank" rel="noopener"
+&gt;高效获取信息，你需要这份 RSS 入门指南——少数派&lt;/a&gt;，里面基本涵盖了通过接入服务来阅读RSS的方法，不过个人更喜欢脱离具体平台的本地软件，所以我推荐Windows平台的&lt;a class="link" href="https://quiterss.org/" target="_blank" rel="noopener"
+&gt;QuiteRSS&lt;/a&gt;和Android上的&lt;a class="link" href="https://www.coolapk.com/apk/com.blend.rolly" target="_blank" rel="noopener"
+&gt;Rolly RSS Reader&lt;/a&gt; 。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/05/22/jEHheQqSo9rvwlN.png"
+loading="lazy"
+alt="Snipaste_2020-05-22_19-10-02.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/05/22/wopH1XE354cPfRU.jpg"
+loading="lazy"
+alt="photo_2020-05-22_19-15-34.jpg"
+&gt;&lt;/p&gt;
+&lt;h3 id="总结"&gt;总结
+&lt;/h3&gt;&lt;p&gt;RSS会不会复兴？即使是很多资深的订阅者也看衰RSS的前途，缺少更多的多媒体呈现方式和不够智能化和集中化的订阅方式的确不再适合当前的互联网环境，如果问我，我也不会认为这种东西将会成为主流。那么为何我仍然会选择这种方式？&lt;strong&gt;因为在面对觊觎我个人喜好和把各种网络服务打成大礼包一股脑地砸在我头上的无良互联网公司，只有使用这种原始化的信息获取方式才能保留作为用户的尊严。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;PS：本站已经支持&lt;a class="link" href="https://takuron.top/feed.xml" target="_blank" rel="noopener"
+&gt;RSS订阅&lt;/a&gt;。&lt;/p&gt;</description></item></channel></rss>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>穿戴式 on Takuron</title><link>https://takuron.com/tags/%E7%A9%BF%E6%88%B4%E5%BC%8F/</link><description>Recent content in 穿戴式 on Takuron</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sat, 10 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://takuron.com/tags/%E7%A9%BF%E6%88%B4%E5%BC%8F/index.xml" rel="self" type="application/rss+xml"/><item><title>使用开源的Gadgetbridge管理小米手环4</title><link>https://takuron.com/post/id0023/</link><pubDate>Sat, 10 Apr 2021 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0023/</guid><description>&lt;img src="https://i.loli.net/2021/04/10/em5ysORGpYJHola.png" alt="Featured image of post 使用开源的Gadgetbridge管理小米手环4" /&gt;&lt;h2 id="前言"&gt;前言
+&lt;/h2&gt;&lt;p&gt;小米手环已经更新到了6，但越看更新越没有换的欲望，手环的功能到现在为止都没有突破性的改变，而手表还是一如既往的耗电。反而是小米运动APP（其实应该是华米的运动APP吧）的广告越来越遭人烦，这让我的视线逐步向第三方的方案转移。虽然在此之前有同为精简第三方的Notify &amp;amp; Fitness for Mi Band，但留一个破解本体还是让人难免不舒服，于是这次转而使用开源的Gadgetbridge，而且说句实话，在整理好的APP帮助下个人认为体验是最好的。&lt;/p&gt;
+&lt;h2 id="安装步骤"&gt;安装步骤
+&lt;/h2&gt;&lt;p&gt;&lt;a class="link" href="https://takuron.lanzous.com/b0armx34f" target="_blank" rel="noopener"
+&gt;备用下载位置&lt;/a&gt;，密码：cug3&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;在官方APP中将手环的账号绑定（完成后可卸载）： &lt;img src="https://i.loli.net/2021/04/10/2W3lUxhYoSRyiHA.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-47-16.jpg"
+&gt;&lt;/li&gt;
+&lt;li&gt;下载&lt;a class="link" href="https://codeberg.org/vanous/huafetcher" target="_blank" rel="noopener"
+&gt;huafetcher&lt;/a&gt;用于获取加密key 。&lt;/li&gt;
+&lt;li&gt;在第二项选择为xiaomi：&lt;img src="https://i.loli.net/2021/04/10/TPrMg1OHoKb6RL8.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-47-38.jpg"
+&gt;&lt;/li&gt;
+&lt;li&gt;选择Get token进入网页，登录小米账号（这里注意修改手机号为+86）：&lt;img src="https://i.loli.net/2021/04/10/pzZSOuPiwDX6HqY.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-47-47.jpg"
+&gt; &lt;img src="https://i.loli.net/2021/04/10/lyeKfqND7PRovrV.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-47-51.jpg"
+&gt;&lt;/li&gt;
+&lt;li&gt;这里会报错，这是正常的，直接复制地址栏所有内容到URL result内：&lt;img src="https://i.loli.net/2021/04/10/j3o2SiMUryEH7IX.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-47-57.jpg"
+&gt; &lt;img src="https://i.loli.net/2021/04/10/hsCqDYbkFyHPUun.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-48-02.jpg"
+&gt;&lt;/li&gt;
+&lt;li&gt;选择“Fetch key”，把下方生成的key复制走（到这里这个APP可以卸载了）&lt;/li&gt;
+&lt;li&gt;下载&lt;a class="link" href="https://codeberg.org/Freeyourgadget/Gadgetbridge" target="_blank" rel="noopener"
+&gt;Gadgetbridge&lt;/a&gt;，进入后点击右下角的“+”，然后搜索你的小米手环：&lt;img src="https://i.loli.net/2021/04/10/3nitAx8zl6vePhp.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-48-15.jpg"
+&gt;&lt;/li&gt;
+&lt;li&gt;这里长按进去，拖到底下，找到认证密钥，输入你刚刚复制的key到里面，回去连接，就可以正常使用了。&lt;img src="https://i.loli.net/2021/04/10/Ww3GpNkdzHTuvPD.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-48-19.jpg"
+&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;之后只要不动官方APP内的绑定关系就能一直使用了。&lt;/p&gt;
+&lt;h2 id="优劣势对比"&gt;优劣势对比
+&lt;/h2&gt;&lt;p&gt;与小米手环官方APP和小米手环专用的Notify &amp;amp; Fitness for Mi Band比起来，Gadgetbridge有以下优势：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;开源 免费（相对Notify &amp;amp; Fitness for Mi Band） 无广告（相对官方）&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;通用方案，可以同时兼容其他品牌的手环。&lt;/li&gt;
+&lt;li&gt;轻便优雅，官方APP不需要修改不需要保留给爷爬。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;那么，代价是什么呢？&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;缺少对心跳、月经（米环5）等小米手环特色功能的支持&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;更换主题不方便（这个可以用官方APP当工具人）&lt;/li&gt;
+&lt;li&gt;通知管理不太符合个人的使用习惯（个人一般喜欢设置仅聊天手环通知，而这个应用默认·是黑名单模式）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="总结"&gt;总结
+&lt;/h2&gt;&lt;p&gt;AD米一生黑，开源万岁。&lt;/p&gt;</description></item></channel></rss>

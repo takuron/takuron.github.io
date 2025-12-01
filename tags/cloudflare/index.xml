@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Cloudflare on Takuron</title><link>https://takuron.com/tags/cloudflare/</link><description>Recent content in Cloudflare on Takuron</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Fri, 06 Jul 2018 00:00:00 +0000</lastBuildDate><atom:link href="https://takuron.com/tags/cloudflare/index.xml" rel="self" type="application/rss+xml"/><item><title>cloudflare对gitlab page的加速效果</title><link>https://takuron.com/post/id0010/</link><pubDate>Fri, 06 Jul 2018 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0010/</guid><description>&lt;img src="https://i.loli.net/2020/02/07/mP7ndhTLWK4OzJX.jpg" alt="Featured image of post cloudflare对gitlab page的加速效果" /&gt;&lt;p&gt;最近了解到了国外的免费cdn加速商cloudflare，自带https比那个要备案还非要收钱才能用https的百度加速云看上去好不少，所以测试了一下加速效果。&lt;/p&gt;
+&lt;p&gt;以下是本人新建的测试网页 &lt;strong&gt;（已失效）&lt;/strong&gt;，二者网页内容完全相同：&lt;/p&gt;
+&lt;p&gt;[&lt;a class="link" href="https://speedtest-gitlab.zsxh.me/" target="_blank" rel="noopener"
+&gt;gitlab无加速&lt;/a&gt;](&lt;a class="link" href="https://speedtest-gitlab.zsxh.me/" target="_blank" rel="noopener"
+&gt;https://speedtest-gitlab.zsxh.me/&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;[&lt;a class="link" href="https://speedtest-cloudflare.zsxh.me/" target="_blank" rel="noopener"
+&gt;cloudflare加速后&lt;/a&gt;](&lt;a class="link" href="https://speedtest-cloudflare.zsxh.me/" target="_blank" rel="noopener"
+&gt;https://speedtest-cloudflare.zsxh.me/&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;首先直观感受：无变化，甚至还能慢一点，尤其是图片加载的时候（这貌似在下面的文件下载测试时获得了证实），但是统计网站给的数据却让人大跌眼镜。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/03/26/faMh5uvgPX7Sm1x.jpg"
+loading="lazy"
+alt="6897991-93bb44ab03ebf065.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/03/26/eTKQSd9ukmFIMCf.jpg"
+loading="lazy"
+alt="6897991-da6128f02fa2482a.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;前面的是没有经过加速的网页，很明显加载速度完全不是一个量级，后者秒杀前者，这和我们的直观体验不服，所以我换了一个更真实的网页测速器，[&lt;a class="link" href="https://www.webpagetest.org/" target="_blank" rel="noopener"
+&gt;webpagetest&lt;/a&gt;](&lt;a class="link" href="https://takuron.top/go?url=https://www.webpagetest.org/" target="_blank" rel="noopener"
+&gt;https://takuron.top/go?url=https://www.webpagetest.org/&lt;/a&gt;)是一个利用真实浏览器来测试整个网页加载过程的测试网站，我们用它的北京节点来测试一下。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/03/26/TRJfNXGw6MuFZrk.jpg"
+loading="lazy"
+alt="6897991-fe680699c8973246.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/03/26/cDnTYQsWBu95NgK.jpg"
+loading="lazy"
+alt="6897991-f24320387b2c93fc.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;很明显这个才和实际体验相符，cloudglare对文本文件进行了有效的加速，可对于图片等资源文件却一点不留情面，不仅没能加速反而搞起了减速。&lt;/p&gt;
+&lt;p&gt;文件下载测试可以选择网站里最上方的download，会出现一个视屏文件，利用那个视频文件可以测试下载速度。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/03/26/w7y1Uhrt5kDoe4L.jpg"
+loading="lazy"
+alt="6897991-b804052a034d1c9b.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;看样子不仅是没有起到加速的作用，反而出现了减速的迹象，果然没有对媒体文件进行缓存。&lt;/p&gt;
+&lt;p&gt;综上，cloudflare对于页面的加速还是不错的，可惜由于抠门，媒体资源文件走cdn的减速抵消了页面的加速效果，所以说使不使用cloudflare完全是一个可选项，因为就算加速效果也不明显。&lt;/p&gt;</description></item></channel></rss>
