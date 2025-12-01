@@ -36,9 +36,9 @@ weight: 1       # You can add weight to some posts to override the default sorti
 
 建议前往[微软评估中心（已失效）](https://www.microsoft.com/zh-cn/evalcenter/download-windows-10-enterprise)或者[NEXT, ITELLYOU](https://next.itellyou.cn/)下载，这里转载一个磁力链接（这个发布至今都没有更新，应该也许可能大概不会再变动了吧）
 
-'''
+```
 magnet:?xt=urn:btih:366ADAA52FB3639B17D73718DD5F9E3EE9477B40&dn=SW_DVD9_WIN_ENT_LTSC_2021_64BIT_ChnSimp_MLF_X22-84402.ISO&xl=5044211712
-'''
+```
 
 ### 提取并压缩install.wim
 
@@ -46,17 +46,17 @@ magnet:?xt=urn:btih:366ADAA52FB3639B17D73718DD5F9E3EE9477B40&dn=SW_DVD9_WIN_ENT_
 
 接下来我们使用dism对这个镜像重新压缩成esd格式，首先以管理员模式打开powershell，输入以下命令：
 
-'''
+```
 dism /Get-WimInfo /WimFile:【解压出来的install.wim目录，例如D:\Win10_Work\install.wim】
-'''
+```
 
 此时会输出镜像的所有版本（包含家庭版、专业版等），对于常规Windows版本，我们需要选择一个特定的版本来压缩。但正常我们这个目录应当只有一个版本。
 
 接下来我们重新压缩这个文件，输入以下命令：
 
-'''
+```
 dism /Export-Image /SourceImageFile:【install.wim目录】 /SourceIndex:1 /DestinationImageFile:【将要输出的install.esd目录】 /Compress:recovery
-'''
+```
 
 接下来只需要等待，按帖子那位老哥所说需要很久，但我的R9 9900x确实几分钟就压缩好了（跑
 
