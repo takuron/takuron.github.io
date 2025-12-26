@@ -432,7 +432,7 @@ archlinux-java set <JAVA_ENV_NAME>
 paru -S webstorm
 ```
 
-此时**在电脑中已有Java环境的情况下**前往安装目录寻找启动脚本并执行。该脚本可以在没有jetbarin的jre的情况下用默认Java环境打开对应IDE。
+此时**在电脑中已有Java环境的情况下**前往安装目录寻找启动脚本(以webstorm为例，目录应该在 /opt/webstorm/bin/webstorm.sh)并执行。该脚本可以在没有jetbarin的jre的情况下用默认Java环境打开对应IDE。
 
 完成初始化后，我们在主菜单使用``Ctrl + Shift + A``快捷键搜索``选择IDE的启动Java运行时``（中文）或者``Choose Boot Java Runtime for the IDE``（英文），在新建里面随便下载一个（首次安装）/选择上一个IDE已经下载好的路径即可。
 
