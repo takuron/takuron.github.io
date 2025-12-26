@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>密码学 on Takuron</title><link>https://takuron.com/tags/%E5%AF%86%E7%A0%81%E5%AD%A6/</link><description>Recent content in 密码学 on Takuron</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Mon, 24 Nov 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://takuron.com/tags/%E5%AF%86%E7%A0%81%E5%AD%A6/index.xml" rel="self" type="application/rss+xml"/><item><title>个人软件开发记录01：密码派生工具AegixPass</title><link>https://takuron.com/post/id0033/</link><pubDate>Mon, 24 Nov 2025 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0033/</guid><description>&lt;img src="https://img.takuron.com/20251124/166cc411d9998f24dfa03994a4e05a2e.webp" alt="Featured image of post 个人软件开发记录01：密码派生工具AegixPass" /&gt;&lt;blockquote&gt;
+&lt;p&gt;此系列用于记录和介绍一些我开发的一些小垃圾软件。随着LLM的编程能力的提升，其编写的代码已经逐步从仅供扩展思路逐渐过渡到只需要检查修改后即可直接使用的程度。这也大大提高了独立开发者的开发能力和加快了他们的开发速度，也为我实现这些小需求提供了充足的便利。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;a class="link" href="https://aegixpass.takuron.com/" target="_blank" rel="noopener"
+&gt;AegixPass&lt;/a&gt; 是一种确定性密码派生工具，其设计目的用于根据根密码和区分代码为不同应用生成一个专属的确定性的、无法逆向的派生密码来保障用户安全。&lt;/p&gt;
+&lt;h2 id="需求提出"&gt;需求提出
+&lt;/h2&gt;&lt;p&gt;一切需求起源于前几年本人对于密码管理方式的革新。在此之前，我已经使用KeePass和随机密码来保管部分密码，但随着&lt;a class="link" href="https://sspai.com/post/55403" target="_blank" rel="noopener"
+&gt;《2019年科学且免费的复合密码管理策略 - 少数派》&lt;/a&gt;给我的启发，我也切换到了如文中所说的模式。简单概述就是通过一个根密码+每个应用一个区分代码+哈希函数单向为每个账号准备一个独立的强安全性的独有密码，并且继续用密码管理器记录作为备份，这样就同时解决了一次记忆和防撞库攻击的问题。六年过去，我本人的账号安全策略也逐步从纯密码到TOTP再到现在直接使用Yubikey硬件密钥保护的模式，但密码这个最基本的安全验证随着各种无密码模式下的不方便而告吹。&lt;/p&gt;
+&lt;p&gt;所以回顾这个密码管理方案，其思路本身在不考虑基于更好的类似TOTP的验证方案前依然算得上先进，但原博主使用的SeekPassword现在回顾已经暴露出了大量问题，其中一些问题的更详细细节会在下文设计中讨论：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;密码长度固定为10&lt;/strong&gt;：相比于其他的问题这个在实际使用过程中反而是最严重的，虽然10位的数字字母符号的混合的组合数依然足够多，但随着各类安全事件的发展，用户密码的长度要求反而在逐渐增加，在2025年的当下要选择一个合适的密码长度明显是被原文章认为会被一些网站拒绝的16位更为合适，网站会要求12位以上的长密码的情况明显比远古网站设置密码长度上限为12的情况更普遍。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;MD5早已不再安全&lt;/strong&gt;：SeekPassword使用了MD5作为其底层的摘要函数，但是MD5极快的运算速度和算法内部的固有缺陷已经让MD5频繁遭受碰撞攻击，2008 年，美国卡内基梅隆大学软件工程研究所就得出结论，认为 MD5“在密码学上已被攻破，不适合继续使用”。虽然SeekPassword进行了加盐和多次混淆等操作，但其密码学安全的根基已经被证明不再可靠，仅靠这些小把戏完全无法保证算法的安全性。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;其他的底层安全和实用问题&lt;/strong&gt;： SeekPassword的底层设计充满了随意性，包括用特定的字符串进行大小写判断让最终密码里元素权重不等的情况下还无法保证存在所有类型的字符、映射集可自定义性几乎为零、Seek的过程浪费时间等等。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;虽然平心而论原作者是借鉴花密的同时保留了一些其时代的问题，但这个算法完全无法满足现代密码学安全要求也是事实，现在我迫切需要一个新的算法来取代这个过时设计，其要满足以下要求：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;更加安全的密码派生方式&lt;/strong&gt;：需要一套更现代的密码派生算法，其在当前环境可以证明其加密组件的安全的同时最好能同时对抗一些暴力破解。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;更加丰富的配置选项&lt;/strong&gt;：新算法应当有更多可以配置的选项，对于派生出的密码长度、包含字符类型等应该具有更好的可配置性的同时方便使用。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;保留SeekPassword的已有优点&lt;/strong&gt;：包括密码的唯一派生、复杂度保证、网页跨平台、实现可方便复现和开源可审计修改等。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="产品设计"&gt;产品设计
+&lt;/h2&gt;&lt;p&gt;在此之前我也尝试过实现一些类似满足以上要求的产品例如MokaPasswordV1/V2，但随着可配置项增多在实际使用中发现过多的可配置选项反而成了用户使用和记忆的负担。以前我使用密码管理工具只需要记录的区分代码反而变成需要详细记录密码位数、使用的字符集等更多信息。并且根据观察，SeekPassword是正确地实现了“替用户做选择”：即选择一个80%以上情况可用的通用配置来减少用户的上手门槛，故新产品一上来就决定采用预配置的标准预设文件的方案：大多数用户只需要选择默认和其衍生的预设即可，对于小众需求则将更多可选配置放入高级的编辑预设中。&lt;/p&gt;
+&lt;p&gt;然后是算法的设计，SeekPassword的哈希-混淆-查找尤其是现在MD5已经被证明不再安全的情况下在密码学角度完全就是自欺欺人：混淆尤其是在公开算法的情况下完全不会产生新的安全性，反而导致算法理解复现的困难。密码学中的“柯克霍夫原则”（Kerckhoffs&amp;rsquo;s Principle）强调一个密码系统的安全性不应依赖于对其算法的保密，而应仅仅依赖于密钥的保密。算法的安全主要依赖构成其加密组件本身是否安全，所以应当选择一个业界公认的、为密码哈希场景专门设计的安全算法并正确地使用它才是正确方法。因而从MokaPasswordV1/V2选择使用的SHA3到最新版AegixPass使用的Argon2id，我只需要选择最适合的哈希算法然后考虑如何基于其派生即可。&lt;/p&gt;
+&lt;p&gt;接下来是密码派生，这个是上一代MokaPassword最失败的点之一，我一直想的是使用“映射”的方法来解决问题（包括其实在目前的AegixPass依然遗留了部分这个问题）：将已经生成的256/512位的数据集对应到新的密码里面，这就有很明显的问题：密码短的时候有数据利用不上，而因为整个字符集长度存在上限导致长密码又无法生成。这个问题在我与Gemini讨论的时候得到了一个新的方案：使用伪随机流。伪随机流算法类似于一个无尽的牌堆，其可以根据你的密钥和Nonce（本算法未使用）来生成无数个完全随机的数，一般情况下我没会寻找熵来生成种子以产生完全随机的数，但这里我没利用了&lt;strong&gt;密钥和Nonce相同的队列总是会产生同样的流&lt;/strong&gt;来无限地作为我每次选择的依据：只要前述哈希正确匹配那么后面的选择过程相当于每次复现一样的操作，那必然产生相同的密码，而完全不用考虑长度和分割的问题。&lt;/p&gt;
+&lt;p&gt;最终确定了以下设计思路：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;采用预设来管理更多设置，并给用户设计好默认预设。&lt;/li&gt;
+&lt;li&gt;使用哈希函数生成种子，然后使用伪随机流生成供密码生成的流。&lt;/li&gt;
+&lt;li&gt;根据生成流的值挑选和排序字符。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="算法概览"&gt;算法概览
+&lt;/h2&gt;&lt;p&gt;具体可以参考&lt;a class="link" href="https://aegixpass.takuron.com/algorithm" target="_blank" rel="noopener"
+&gt;AegixPass 算法核心设计&lt;/a&gt;（感觉Gemini写的比我写的好）。&lt;/p&gt;
+&lt;h3 id="生成前准备"&gt;生成前准备
+&lt;/h3&gt;&lt;p&gt;需要准备以下的内容：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;主密码 (password_source)&lt;/li&gt;
+&lt;li&gt;区分密钥 (distinguish_key)：用于根据网站的不同用于区分的标记&lt;/li&gt;
+&lt;li&gt;预设 (preset)：&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-json" data-lang="json"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;AegixPass - Default&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;version&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;hashAlgorithm&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;argon2id&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;rngAlgorithm&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;chaCha20&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;shuffleAlgorithm&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;fisherYates&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;length&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;16&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;platformId&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;aegixpass.takuron.com&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="nt"&gt;&amp;#34;charsets&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s2"&gt;&amp;#34;0123456789&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s2"&gt;&amp;#34;abcdefghijklmnopqrstuvwxyz&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s2"&gt;&amp;#34;ABCDEFGHIJKLMNOPQRSTUVWXYZ&amp;#34;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="s2"&gt;&amp;#34;!@#$%^&amp;amp;*_+-=&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;这里用于帮助用户打包保存各种配置，其中对charsets分组来保证每个分组里面都有至少一个字符被使用来获得字符类型的保障。&lt;/p&gt;
+&lt;h3 id="产生主种子对应阶段b"&gt;产生主种子（对应阶段B）
+&lt;/h3&gt;&lt;p&gt;然后根据以上信息构建一个字符串：&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;&amp;quot;AegixPass_V{version}:{platform_id}:{length}:{password_source}:{distinguish_key}:{charsets_json}&amp;quot;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;然后使用这个字符串进行哈希计算，快哈希算法会直接生成，两种慢哈希则会用sha256(platform_id)生成一个salt，然后使用对应慢哈希算法生成256位的哈希。&lt;/p&gt;
+&lt;h3 id="选择字符对应阶段c和d"&gt;选择字符（对应阶段C和D）
+&lt;/h3&gt;&lt;p&gt;先从每个字符组里面挑选一个字符，将 32 字节的主种子按顺序分割成多个 4 字节（32位无符号整数）的块，然后根据这个4字节对字符组长度取余实现随机取一个字符。（但实际上这个是我修补Gemini设计的一个方案，正确地实现方式在下面）。&lt;/p&gt;
+&lt;p&gt;接下来我我们再抽取剩下需要用到的字符，这里就用上述的主种子作为一个伪随机流的种子开始生成伪随机流。然后我们每次也是取4字节之后产生一个无偏随机数用于在上面所有charsets合并在一起的大字符组中随机抽取字符直至抽取够数量。&lt;/p&gt;
+&lt;h3 id="打乱对应阶段e"&gt;打乱（对应阶段E）
+&lt;/h3&gt;&lt;p&gt;最后使用Fisher-Yates 洗牌算法进行一次打乱顺序，对于每一个位置生成一个随机位置和当前位置交换。这样整个顺序就可以按特定的规律进行“打乱”后即可输出最终的密码了。&lt;/p&gt;
+&lt;h2 id="实际开发"&gt;实际开发
+&lt;/h2&gt;&lt;p&gt;实际开发的时候使用的是（白嫖来的）Gemini 2.5pro的网页版本，不使用claude/gemini的cli版本一是因为代理问题我懒，二是即使使用这种方法来完整展示项目结构，目前的llm依旧普遍缺乏项目组织能力，对于大型项目来说开发者依然需要手动组织代码结构，所以网页直接导入当前大致的开发状态让其编写函数后自己组织是最合适的开发方法。&lt;/p&gt;
+&lt;p&gt;本人使用了Rust和前端TypeScript/Svelet Kit实现了两种版本来保证该算法的跨平台实现可能，其中可能最麻烦的是随机数的生成问题：即使随机队列相同，不同语言的随机数生成也会以不同的方法”随机“取数：这不是我们需要的，故在Ai的帮助下选择直接手写一个一段随机值生成特定范围随机数的算法。&lt;/p&gt;
+&lt;p&gt;Vibe Coding目前看来对尤其是脚本/小工具这种简单需求已经基本可以做到只做Code Review即可，但即便如此还是需要注意项目结构的规范化和最新文档的提供参考：例如这个项目我ui使用的daisy ui v5就过于新，但是其文档很贴心的提供了复制导入llm的提示，只需要复制文档内容供llm参考就基本可以做到即使是不在llm知识库里的框架也可以轻松调用。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;另外对于更复杂的项目则更需要“帮AI解耦”：自己设计项目的架构、类的接口等让AI做“填字游戏”，并且一定要仔细检查AI的实现逻辑并做好文档，坚决避免让AI自行调整架构。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id="上线和测试"&gt;上线和测试
+&lt;/h2&gt;&lt;p&gt;对应工具目前&lt;a class="link" href="https://aegixpass.takuron.com/" target="_blank" rel="noopener"
+&gt;发布在这里&lt;/a&gt;，可以在Github找到&lt;a class="link" href="https://github.com/takuron/AegixPass" target="_blank" rel="noopener"
+&gt;Rust版本源码（算法实现测试）&lt;/a&gt;和&lt;a class="link" href="https://github.com/takuron/aegixpass-svelte" target="_blank" rel="noopener"
+&gt;基于Svelte Kit的网页版源码&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/20251124/ccd21eb414f8fbaa0aca739da566c959.webp"
+loading="lazy"
+alt="ccd21eb414f8fbaa0aca739da566c959.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;LLM依然可以快速解决算法端的测试用例问题（只要你记得需要写），对于实际运行的Bug大多数也只需要描述给LLM即可快速定位（不过不一定他自己能转出来解决，但能快速定位Bug已经是帮了大忙了）。实际我已经在使用这个工具生成密码了，目前未发现非常明显的Bug。&lt;/p&gt;</description></item></channel></rss>
