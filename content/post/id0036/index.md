@@ -25,7 +25,7 @@ weight: 1       # You can add weight to some posts to override the default sorti
 
 为了简单解释这些组件的必要性，这里我将简单讲解视频播放的过程，如果不愿意了解请直接跳转下一节。
 
-视频播放是一个线性的流水线工作，数据会根据 ** 源文件 (Source) → 分离 (Splitter) → 解码 (Decoder) → 渲染 (Renderer) → 显示设备 ** 的顺序经过处理最终提供显示
+视频播放是一个线性的流水线工作，数据会根据 **源文件 (Source) → 分离 (Splitter) → 解码 (Decoder) → 渲染 (Renderer) → 显示设备** 的顺序经过处理最终提供显示
 
 视频文件（如 .mkv, .mp4）本质上是一个装载数据的容器（Container）。为了将封装在容器内混杂的“视频流”、“音频流”和“字幕流”拆分开来供后续环节处理，我们需要一个分离程序负责拆解这些“外壳”。LAV Filters 组件中的 LAV Splitter 正是负责这一关键的分离工作。
 
