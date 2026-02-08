@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>网络 on Takuron</title><link>https://takuron.com/tags/%E7%BD%91%E7%BB%9C/</link><description>Recent content in 网络 on Takuron</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sun, 29 Dec 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://takuron.com/tags/%E7%BD%91%E7%BB%9C/index.xml" rel="self" type="application/rss+xml"/><item><title>OPNsense使用记录03：IPv6网络配置</title><link>https://takuron.com/post/id0029/</link><pubDate>Sun, 29 Dec 2024 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0029/</guid><description>&lt;img src="https://img.takuron.com/blogpost/KABjvaXbhSmWkCg.webp" alt="Featured image of post OPNsense使用记录03：IPv6网络配置" /&gt;&lt;p&gt;IPv6（Internet Protocol Version 6）是网络层协议的第二代标准协议，也被称为IPng（IP Next Generation）。它是Internet工程任务组IETF（Internet Engineering Task Force）设计的一套规范，是IPv4（Internet Protocol Version 4）的升级版本。随着国内大力推进IPv6网络的建设，目前启用IPv6与IPv4的双栈网络可以在不影响网络质量的同时获得具有公网IPv6的诸多便利，这里专门介绍一下如何在国内家宽条件下在OPNsense中配置IPv6网络。&lt;/p&gt;
+&lt;h2 id="ipv6基础为什么应该使用ipv6"&gt;IPv6基础：为什么应该使用IPv6
+&lt;/h2&gt;&lt;p&gt;本人不是猫在机房的运维，这里主要介绍家用环境有用的实践内容和也许可能大概有用的个人理解，如有错误欢迎批评指正，更多详细的基础理论可以看这里： &lt;a class="link" href="go?url=https://cshihong.github.io/2018/01/29/IPv6%E5%9F%BA%E7%A1%80/" &gt;IPv6基础 曹世宏的博客&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;很多人都知道IPv6具有的巨大的地址空间及其带来的公网IP不要钱，但IPv6并不只是IPv4++，比起地址空间扩大更重要的是整个协议的技术细节都进行了升级，就说对我们使用来说最重要的，其配网难度和效率都获得了提升，且一些IPv4的常见问题也获得了一定程度的解决。个人觉得最重要的其实是其自动配置和去中心化理念。&lt;/p&gt;
+&lt;p&gt;IPv6地址在小规模网络中大部分都可以通过SLAAC(Stateless Address Autoconfiguration，无状态地址自动配置)来获得，而这个过程本身的底层逻辑是终端设备自行声明检测冲突，不需要繁杂的手动配置或者DHCP通告。很多人会注意到即使在纯IPv4的网络中也会在Windows设置里看到一个IPv6地址，这就是在你网口本身启用了IPv6协议栈后尝试通过NDP（Neighbor Discovery Protocol，邻居发现协议，用于代替IPv4的ARP协议和ICMP路由发现）获取全球唯一地址的同时先行声明的链路本地地址。这个地址无需任何网关或者其他二层设备，而且由于无状态地址的声明机制和乐观DAD（Duplicate Address Detection，地址重复性检测）的存在，只要没有收到其他设备发送的ip冲突的邻居通告那么终端设备就会自己完成这个简单地本地链路建立，此时如果有其他设备与其同处一个二级链路他们之间的网络就已经自动配好了（本地链路地址根据MAC地址生成，很难冲突）。&lt;/p&gt;
+&lt;p&gt;至于公网地址同样可以不依赖传统的静态配置或者DHCP，路由器在通过NDP建立路由表的同时会进行路由器通告，若选择只使用无状态网络则只需要路由器通告默认路由地址和网络前缀即可。在无状态网络下客户端会根据路由器获得的前缀（类似IPv4的网段）自动生成至多3个IPv6地址并进行DAD后即可使用，无需路由器的更多干预。这种无状态的配网可以说解放了小规模网络里面路由器的大量任务，客户端本身就能独立自动配置大量信息有效的提升了组网能力。&lt;/p&gt;
+&lt;p&gt;而且最重要的是，这些并不是强制的换代。IPv4和IPv6的双栈网络可以同时保证兼容性和利用上新的特征，且在管理要求更高的企业那位中你仍可以选择DHCPv6和NAT这些传统的管理技术。至于其他的类似更简洁灵活的报头、自动检测链路MTU同时解决v4分片的问题、更强大的组播和更好的移动网络支持之类的，老顽固们不关心也不在乎，毕竟对他们来说问题只有不安全和麻烦。&lt;/p&gt;
+&lt;h2 id="opnsense中为家庭网络配置ipv6"&gt;OPNsense中为家庭网络配置IPv6
+&lt;/h2&gt;&lt;h3 id="默认最佳设置"&gt;默认最佳设置
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;其实这个设置在第一篇中已经基本配置完毕了，这里的设置基于山东联通家宽。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;首先在接口/wan口获取可供分配的前缀，这里一定要勾选的只有使用ipv4连接获取，请求前缀长度在国内家宽会被直接无视可以不用设置，委派的前缀也是从56bit到直接不允许继续委派的64bit参差不齐，如果需要设置可以照着后面获取到的前缀长度来设置。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://s2.loli.net/2024/12/30/AYfntsWNz18xelc.webp"
+loading="lazy"
+alt=" 2024-12-30 09-21-34.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;lan口的IPv6设置为跟随wan口且允许手动调整DHCPv6和服务器通告。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://s2.loli.net/2024/12/30/Oi2EJdkLKy4w9xt.webp"
+loading="lazy"
+alt=" 2024-12-30 09-22-21.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;然后我们打开服务，路由器通告设置。这里路由器通告的设置类型详细可以直接参考官方的注释，如上文所说，家用环境中直接只启用SLAAC即可，因为像Android这种消费级设备据称很多根本就不支持DHCPv6。然后为了简洁这里直接取消选择使用DHCPv6的dns设置。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://s2.loli.net/2024/12/30/4BsaXJFiAen5Nyo.webp"
+loading="lazy"
+alt=" 2024-12-30 09-22-39.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;这里为IPv6配置再设置一下DNS，其实对于双栈网络来说设置IPv6的DNS服务器不是必须的，通过IPv4的DNS查询也可以获取AAAA类型的解析来进行IPv6访问。打开AdGuardHome，找到设置这里的设置向导，这里显示了所有AdGuardHome绑定的接口ip，这里可以记下pppoe接口的本地链路地址设置给IPv6通告。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://s2.loli.net/2024/12/30/EIAsuFydaXPG9nR.webp"
+loading="lazy"
+alt=" 2024-12-30 09-23-10.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://s2.loli.net/2024/12/30/sKCtdqwoT9XNuzU.webp"
+loading="lazy"
+alt=" 2024-12-30 09-27-26.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;再次查看AdGuardHome的日志可以看到已经有来自IPv6的查询记录。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://s2.loli.net/2024/12/30/bqhGaPic9LzA6CN.webp"
+loading="lazy"
+alt=" 2024-12-30 09-28-43.webp"
+&gt;&lt;/p&gt;
+&lt;h3 id="dhcpv6的设置"&gt;DHCPv6的设置
+&lt;/h3&gt;&lt;p&gt;当然你依然可以选择传统的DHCPv6，先讲直接分配公网前缀的方法。当你按照上述的wan口拨号配置正确获取到了IPv6前缀且lan口正确跟随后，打开服务/DHCPv6可以看到你获取的前缀。此时只需要设置子网可分配范围和前缀委派范围就好了。前者类似DHCPv4，后者则允许下面的路由器继续获取子网前缀，所有这些设置只需要设置后缀的范围就可以了，前缀会根据wan口获取的产生变化，按照IPv6简写方法省略即可。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://s2.loli.net/2024/12/30/4BsaXJFiAen5Nyo.webp"
+loading="lazy"
+alt=" 2024-12-30 09-22-39.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;同时你也可以选择设置为局域网地址，这里我们回到lan口，修改IPv6为静态，然后从IPv6的内网地址段选取一段作为局域网地址。此时可以看到DHCPv6也会跟随变化，此时就可以使用IPv6的局域网地址了。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;不过不太推荐这样设置，自动配置的本地链路地址已经能满足大多数情况家用局域网的局域网互访需求了。这样为了保留IPv6公网能力还需要配置NAT转发或者NPTv6来做和公网地址前缀的映射，这里我不太需要就不详细演示了。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/20250907/145bd2f7b8d0784c5684e0cd72f86be3.jpg"
+loading="lazy"
+alt="Snipaste_2024-11-27_16-55-52-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://s2.loli.net/2024/12/30/TFE4tJqZQ7BlsMg.webp"
+loading="lazy"
+alt="Snipaste_2024-11-27_17-00-51-tuya.webp"
+&gt;&lt;/p&gt;</description></item><item><title>OPNsense使用记录02：第三方软件源和AdGuardHome配置</title><link>https://takuron.com/post/id0028/</link><pubDate>Wed, 27 Nov 2024 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0028/</guid><description>&lt;img src="https://img.takuron.com/blogpost/KABjvaXbhSmWkCg.webp" alt="Featured image of post OPNsense使用记录02：第三方软件源和AdGuardHome配置" /&gt;&lt;p&gt;为了更好的管理家庭网络，我们可以为OPNsense添加更多类型的软件来实现更多功能。&lt;/p&gt;
+&lt;h2 id="添加第三方软件源"&gt;添加第三方软件源
+&lt;/h2&gt;&lt;p&gt;首先为了开启第三方源我们要启动ssh，这个选项可以在系统/设置/管理里面启用安全shell（不建议持续打开，在配置完成后建议关掉）。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/73122fa124ce6702eda534cd9114d563_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-17_10-48-38-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;然后用你服务的的ip登录ssh，这里我选择的是Windows11自带的终端界面，PowerShell里面提供了ssh的登录程序我们直接敲命令登录即可，用户名密码即为你安装的时候的用户名和密码。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/39dc38a490cdaa7a0242afe0400f3b78_MD5.png"
+loading="lazy"
+alt="Snipaste_2024-11-17_10-49-24.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;输入如下命令：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;fetch -o /usr/local/etc/pkg/repos/mimugmail.conf https://www.routerperformance.net/mimugmail.conf
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;然后更新缓存&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pkg update
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;此时打开系统/固件/插件里面搜AdGuardHome，如果有显示即说明mimugmail源添加成功。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/6d26f25f89b05784eeb659b86c3416ce_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-17_10-51-14-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;h2 id="启动adguardhome"&gt;启动AdGuardHome
+&lt;/h2&gt;&lt;p&gt;AdGuard Home 是一款全网广告拦截与反跟踪软件，安装在路由器后即可充当dns服务器对整个网络（通过dhcp设置dns）的设备的dns请求进行处理和广告过滤。&lt;/p&gt;
+&lt;p&gt;首先在上面那个界面点击加号安装AdGuardHome，下载完成后刷新网页，如果能在 服务 里面看到AdGuardHome即为安装成功。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/d8bc2b27a83ed062d1d1deae33e6321e_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-17_10-52-11-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;在启用AdGuardHome之前我们先关掉自带的Unbound DNS，这样我们就可以直接让AdGuardHome监听53端口了。打开服务/Unbound DNS/常规，取消启用（这里我顺便给了个其他端口免得出奇怪问题）。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/915826c96bcf8742f37a3b3930240c33_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-17_10-52-37-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;此时启用AdGuardHome，浏览器打开 你的网关ip:3000 的网页，就可以开始进行常规AdGuardHome配置了。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/4bc2f9f10c12e938d3c93cce4f779854_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-17_10-53-27-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;h2 id="adguardhome个人配置"&gt;AdGuardHome个人配置
+&lt;/h2&gt;&lt;p&gt;AdGuardHome网上的各种教程就比较多了，这里就简单分享下个人的配置方式。注意以上规则是适用于局域网dns分发的规则，自建dns服务和终端设备使用的契合度请自行设计。&lt;/p&gt;
+&lt;p&gt;dns上游这里我选择了思科的OpenDNS并且直接ip访问DNS over https，其没有污染、支持EDNS的同时访问速度亲测在国内还算过得去，不过为了提高效率建议手动拉大缓存容量并且开启乐观缓存（你不开很多上游实际也是乐观缓存，所以开就行了）,然后选择了阿里和DNSpod做后备,启用EDNS提高查询准确性。实测在乐观缓存条件下响应时间整体在50ms以内。&lt;/p&gt;
+&lt;p&gt;更多DoH服务器列表可以参考下&lt;a class="link" href="https://coding.gs/2024/06/09/available-doh/" target="_blank" rel="noopener"
+&gt;这个帖子&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/f7e0fa99d02c39acd9b9b0cdee08a16c_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-27_19-32-38-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/d947c07a23e0f4688b2eb3660bd92aec_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-27_19-32-47-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/8e1076559ff18657ed6fcd568b390cd4_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-27_19-33-14-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;广告过滤规则我选择的是&lt;a class="link" href="https://github.com/217heidai/adblockfilters" target="_blank" rel="noopener"
+&gt;217heidai/adblockfilters&lt;/a&gt;中的DNS拦截版本，只用开启这一个就好了。&lt;/p&gt;</description></item><item><title>OPNsense使用记录01：安装与基本配置</title><link>https://takuron.com/post/id0027/</link><pubDate>Sat, 16 Nov 2024 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0027/</guid><description>&lt;img src="https://img.takuron.com/blogpost/KABjvaXbhSmWkCg.webp" alt="Featured image of post OPNsense使用记录01：安装与基本配置" /&gt;&lt;p&gt;自从去年受够openwrt各种插件之间的兼容性问题和遭遇了n5105小包总线速度问题导致的系统崩溃之后转向了OPNsense系统。作为一个专业的开源防火墙，其中文资料却少得可怜，去年第一次装的时候就准备全程记录一下配置的过程，一直因为时间问题没能实现。到了现在软路由硬件都换了一遍，结果再装还是资料少的可怜频频踩坑，故开坑记录一下，免得我自己也天天往一个坑里跳。&lt;/p&gt;
+&lt;h2 id="前置条件"&gt;前置条件
+&lt;/h2&gt;&lt;p&gt;能选择这个系统的应该对软路由硬件挑选已经有自己的见解了吧，OPNsense 是基于 FreeBSD 的开源防火墙系统，理论上有驱动的硬件你随便选就可以。这里本人使用的是畅网n100的四网畅想版ddr4的版本来安装，并不是什么高性价比的东西单纯偷懒。内存为8g，硬盘则是用了一个傲腾16g，反正不记录log只装系统我就没见过用爆的，本身量大寿命又长，除了强制要有m.2口外其实很适合做这种工控机的系统盘。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/c21f75db8a7c889eb7edd5d7153b4076_MD5.jpg"
+loading="lazy"
+alt="使用的软路由"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class="link" href="https://opnsense.org/users/get-started/" target="_blank" rel="noopener"
+&gt;这里&lt;/a&gt;可以查到官方的硬件要求。&lt;/p&gt;
+&lt;p&gt;&lt;a class="link" href="https://opnsense.org/download/" target="_blank" rel="noopener"
+&gt;你可以在这里下载到OPNsense&lt;/a&gt;，下载类型选择amd64和dvd，镜像国内选北京大学的即可。下载好后可以直接用&lt;a class="link" href="https://rufus.ie/zh/" target="_blank" rel="noopener"
+&gt;rufus&lt;/a&gt;写入u盘安装。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/8740cfde28346a5169dd64f27ebc19a2_MD5.webp"
+loading="lazy"
+alt="下载界面"
+&gt;&lt;/p&gt;
+&lt;h2 id="系统安装"&gt;系统安装
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;因本人没有采集卡并且不喜欢拍屏，故本节非web界面的截图均来自&lt;a class="link" href="https://www.bilibili.com/opus/784755568172597299" target="_blank" rel="noopener"
+&gt;b站@狐狸Nomad&lt;/a&gt;，顺便感谢大佬的指南。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;从u盘启动，一直跑马直到出现“Press any key to start the configuration importer: &amp;hellip;”。不用管。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/1dc4311bc45ff5d9b0ddc1b8eff798cd_MD5.webp"
+loading="lazy"
+alt="mflzo9aaoffx550e.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;等到跑马出现“Press any key to start the manual interface assignment”的时候，你可以点击任何键来配置接口，在这里你可以手动配置一下wan口和lan口。但由于OPNsense的逻辑和openwrt不太一样这里的lan口只能配置一个，我倾向于直接跳过回头webui里面配置。如果你需要改可以按提示设置一下lan和wan对应的网口，其他选项除了最后保存全都直接回车跳过即可。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/1e1237e11b361bbc142a62b1dd0e6cba_MD5.webp"
+loading="lazy"
+alt="yioc701c2ndx4hpy.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/a5db774b7d7b679562356823bb91c7a9_MD5.webp"
+loading="lazy"
+alt="x3xnsvza5ao3sy2d.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;然后就提示登录了，这里我们可以看到OPNsense为我们启动了一个体验版的系统，你可以连接lan口来体验。这里我们登录安装账号来开始安装到本地，在24.7版本安装账号名为installer,密码opnsense。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/f67c13dafeda013572f169984c98b40a_MD5.webp"
+loading="lazy"
+alt="t50aqha0g8eufwp4.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;登录后就进入了安装界面，选择默认键盘布局。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/0e5670f94184b7b4dcc7e416c2055485_MD5.webp"
+loading="lazy"
+alt="cuxvjptvwch2gfi9.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;选择安装的硬盘分区格式，现在默认就是ZFS选择就可以了。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/2a74538c3f6feeca085c2ecbdb22c6a8_MD5.webp"
+loading="lazy"
+alt="067n3phbpqsa7inw.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;选择冗余模式，你可以在这里给系统做软raid，这里一块盘选stripe。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/d0fc28cdd5dedeca3dcb9501097c15ba_MD5.webp"
+loading="lazy"
+alt="8656mlvm1u46q747.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;选择安装的硬盘&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/f312610652aa997367a9c533846c3b8d_MD5.webp"
+loading="lazy"
+alt="qaglrtzszpnerk7e.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;然后就开始安装了，安装结束后会显示这个界面，建议在这里修改一下root用户的密码，回头你需要用这个密码登录管理界面。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/0f27a163930951037627aa6ecfbea2c2_MD5.webp"
+loading="lazy"
+alt="zeo9w02o5pd2nhx8.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;重启，然后等待到提示登录时按照显示的lan口和网关地址打开浏览器就可以看到登录界面了（ssl证书错误请直接了解详细，仍要访问即可）。登录用户名为root，密码为你上一步设置的密码。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/51cb0c478fe5cdfd4d34e954fd43afa2_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-16_19-34-41-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/0b0b0fe4cf7666b7420731f657f053f8_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-16_12-28-43-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;然后就可以接上wan口开始配置了。&lt;/p&gt;
+&lt;h2 id="基本配置"&gt;基本配置
+&lt;/h2&gt;&lt;h3 id="初始化"&gt;初始化
+&lt;/h3&gt;&lt;p&gt;初始化其实按照引导一步步设置即可，首先设置时间和时区，这里可以改成阿里的btp服务器也可以不动。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/21128a7926b2f82975a847508679f15a_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-16_11-12-26-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;设置主机名、dns和语言，这些我们都不用动后面会用AdGuardHome。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/5e0c77fd646a605431a855c291d54001_MD5.webp"
+loading="lazy"
+alt="PixPin_2024-01-17_14-33-06-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;这里有一个图少截了，会问你WAN口的类型，我这里还没插网线直接选的pppoe但没给账号密码，如果上一步你接上了网线可以这会儿就配置了。&lt;/p&gt;
+&lt;p&gt;设置LAN ip和网段，选一个自己喜欢的局域网网段即可。这里我写错了网关地址应为172.24.0.1。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/330c383ca5dda4ee18785f5cda0cc7b1_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-16_11-16-28-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;然后机器就会重启，初始化就基本完成了。&lt;/p&gt;
+&lt;h3 id="启用所有lan口"&gt;启用所有LAN口
+&lt;/h3&gt;&lt;p&gt;pfsense和OPNsense的第一个坑就是他们的接口（interface）都只能实际绑定一个物理网口，&lt;strong&gt;如果需要给几个网口做默认桥接就要每个网口单独设置一个没有网络的接口，然后用网桥连接这些接口后绑定在LAN上&lt;/strong&gt;。这和openwrt的习惯是不一样的。&lt;/p&gt;
+&lt;p&gt;我们现在就来把我这个机器的igc1/2/3设置成互相桥接的LAN口，目前我已经给igc1在安装的时候设置成了机器的LAN，所以我们献给igc2/3建立一个网桥。先建立两个接口，分别绑定物理的网口2/3并启用，不需要任何ip设置。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/a7d42adde49f3a294669d05a49a8f70b_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-16_22-53-51-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;然后我们建立网桥，在接口/其他类型/网桥里面点一下加号，将刚才新建的两个接口加进去。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/c131e544a7931d820c84d5fcfe5be1a8_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-16_12-48-16-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;进入我们原先的LAN接口，把LAN接口改成我们新建立的网桥，保存。（注意所有的接口配置都需要二次选择应用才能生效）&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/66c8be4cb4e541ecaa10ec601ee49096_MD5.webp"
+loading="lazy"
+alt="PixPin_2024-01-17_14-59-40-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;接入网口2/3，再将已经释放的igc1同样的创建接口并加入网桥即可。&lt;/p&gt;
+&lt;h3 id="防火墙初步"&gt;防火墙初步
+&lt;/h3&gt;&lt;p&gt;以上述方法设置的LAN口虽然都可以正常访问网络，而且我们实际做局域网DHCP和NAT的“LAN”接口的规则是进出全部放行，但由于我们引入了新的接口，而这些接口的默认规则是放行出口禁止进口，这样会导致局域网下设备无法互相访问。&lt;/p&gt;
+&lt;p&gt;我们点开防火墙/规则，随便选择一个lan口，加号新建规则，这里我用最简单的方法先放行了所有LAN网络下的主机的入站，这样可以把最需要解决的局域网互相访问先处理好，后续感觉应该修改掉LAN口的全放行来控制流量更符合家用的环境。记得保存完规则后刷新让防火墙生效。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/b81ec8db34ddeca073bfe44daf17982a_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-16_23-14-52-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/8e4ae6553781884d3aa4626ee76e729f_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-16_23-14-15-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;h3 id="拨号dhcp和ipv6初步"&gt;拨号、DHCP和IPV6初步
+&lt;/h3&gt;&lt;p&gt;我们转回到接口WAN，这里以山东联通普通家用有v6的环境为例进行拨号和通过上级路由分配ipv6地址。PPPoe设置非常的简单，只需要在这里写你宽带的用户名和密码就行。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/7facc6352b72650b063057f89328e3f0_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-16_12-51-39-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;然后是ipv6，拖到最底下可以看到DHCPv6客户端的设置，这里比较重要的是使用ipv4连接和仅请求地址前缀（request prefix only）必须打开。前缀委派大小和发送前缀大小这俩开与不开意义不大反正会被运营商美美无视。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/f352587efe0b3c1cb5da5ec5e318e102_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-16_23-30-33-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;在LAN口中打开允许手动调整DHCPv6和路由器通告。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/67791bec3fe8d89626e65efa68d9fe15_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-16_23-31-12-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;此时打开服务/DHCPv6，如果宽带能正常获取ipv6前缀应该可以看到分配的网段，长度从56bits到64bits不等，说明获取ipv6前缀成功。（不过先不要用DHCPv6，我们现在先用SLAAC分配v6更加方便快捷）&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/be8903fdb8005a8b176f7c49e718fa69_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-16_23-32-07-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;我们打开服务/路由器通告，将通告模式设置成unmanaged仅使用SLAAC分配ipv6，这样最基本的拥有ipv6地址就做到了，后面我们会更详细的设置DHCPv6。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/f1fdca300c3a66ae83b2d7fab69fa366_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-16_14-35-55-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;同一级菜单下还可以改变DHCPv4的设定，最需要设置的可能是类似我这种给了更大的局域网网段，这种情况下DHCP可选的ip范围还是不够使用的话可以手动选择范围。&lt;/p&gt;
+&lt;h3 id="更新-备份-杂项"&gt;更新 备份 杂项
+&lt;/h3&gt;&lt;p&gt;转到系统/固件/设置，这里可以先把更新源改成国内的，然后保存返回状态进行更新。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/a5a64112c5d9677765454c65387d54eb_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-16_15-20-12-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;系统/设置/其他里面可以修改主页温度传感器的温度源，志强用户还可以开启硬件加速。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/84e3e43369b75c64f691048c3f74bfb1_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-16_15-07-26-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;系统/设置/任务里面可以为系统设置定时任务，这里我让他每周重启。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/ea7cd109058e57b448196a3e706d63f2_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-17_09-43-23-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;最后我们可以吧已经配置好的配置文件下载下来，这样出现问题直接上传配置文件即可恢复全部设置了。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/331e29fbc363c4c110787d2bb93d0c8c_MD5.webp"
+loading="lazy"
+alt="Snipaste_2024-11-17_09-40-51-tuya.webp"
+&gt;&lt;/p&gt;
+&lt;p&gt;结束&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;最后吐槽一下国内折腾软路由的，表面说支持开源和稳定，实际用着各种高大全魔改TUN的固件，为了开个魔法上网拒绝一切技术进步，ipv6这些和全局魔法冲突的统统全杀了还是避免不了不同模块打架出奇葩问题。你要和他说起稳定转头就投了有黑历史的闭源ikuai，就这样还热衷于all in boom建议两个全都真是系统简洁明了稳定。&lt;/p&gt;
+&lt;p&gt;我个人不喜欢纯粹的全局代理，因为没有一个固定的规则让我满意能完成我的一切需求，毕竟人的需求也是会根据实际情况变动的。个人还是更喜欢细化的给每个需要分流的软件单独设置代理，浏览器直接用两个，这种手动分类才是效率最高的。&lt;/p&gt;
+&lt;/blockquote&gt;</description></item><item><title>为Windows11设置更多DNS over https服务器&amp;一键添加更多服务器脚本</title><link>https://takuron.com/post/id0024/</link><pubDate>Tue, 05 Oct 2021 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0024/</guid><description>&lt;img src="https://img.takuron.com/20250827/ed8fda4fbfdea13178ac39ef421b2ebb.jpg" alt="Featured image of post 为Windows11设置更多DNS over https服务器&amp;一键添加更多服务器脚本" /&gt;&lt;p&gt;早就有闻Windows系统已经添加了系统级的DNS over Https的支持，趁着此次重装Windows11新系统之际换掉AdguardHome改用Windows系统自己提供的DoH支持。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;理论上Windows 10 build 19628以后的所有版本都支持此教程的方法，本人也亲测在Windows Server 2022上成功使用。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id="设置dns-over-https的位置"&gt;设置DNS over Https的位置
+&lt;/h2&gt;&lt;p&gt;以WLAN网络为例：打开设置-WLAN-&lt;strong&gt;硬件属性&lt;/strong&gt;-DNS服务器分配，选择手动。输入一个支持DoH的服务商的DNS地址（例如Google的8.8.8.8），下面灰显的选项就会启用：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/20250827/19ab4d119bcd75a81aa2cf5d404cffc6.png"
+loading="lazy"
+alt="Snipaste_2021-10-05_14-20-37.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/20250827/53f7b46711870002bf18aa4c337fb20f.png"
+loading="lazy"
+alt="Snipaste_2021-10-05_14-19-54.png"
+&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;2021.10.29 这不是一个BUG，这里设置的话可以自动覆盖所有将要连接的WIFI，更好的保护连接公共WIFI带来的隐私问题。
+&lt;s&gt;2021.10.5 你可以在选择网络连接的位置发现同样的选项来设置网络连接的属性，但是不能启用DoH，本文来自Takuron点top，这应该是Windows11的一个BUG。&lt;/s&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;不过我们的设置并没有结束，&lt;strong&gt;坑爹的微软只预置了一些常见的全球DoH服务器，但众所周知天朝不在地球上&lt;/strong&gt;。设置其他服务器不会有任何显示：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/20250827/06670b3bfb0f38aaaeca8a6af77f72b8.png"
+loading="lazy"
+alt="Snipaste_2021-10-05_13-43-47.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;你只能直接设置以下DoH服务器：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Cloudflare(1.1.1.1/2606:4700:4700::1111)&lt;/li&gt;
+&lt;li&gt;Google(8.8.8.8/2001:4860:4860::8888)&lt;/li&gt;
+&lt;li&gt;Quad9(9.9.9.9/2620:fe::fe)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如果需要安装国内常用的DoH服务器需要先添加&lt;/p&gt;
+&lt;h2 id="为系统添加更多dns-over-https服务器"&gt;为系统添加更多DNS over Https服务器
+&lt;/h2&gt;&lt;p&gt;我们需要注册更多的Doh服务器，这可以用以下命令解决（感谢&lt;a class="link" href="https://bbs.pcbeta.com/viewthread-1877659-1-1.html" target="_blank" rel="noopener"
+&gt;如何在win10中自定义doh服务器-远景论坛-微软极客社区&lt;/a&gt;：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;netsh dns add encryption server=&amp;lt;your-server&amp;#39;s-IP-address&amp;gt; dohtemplate=&amp;lt;your-server&amp;#39;s-DoH-URI-template&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;netsh dns show encryption server=&amp;lt;your-server&amp;#39;s-IP-address&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;例如添加阿里的DoH代码：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;netsh dns add encryption server=223.5.5.5 dohtemplate=https://dns.alidns.com/dns-query
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;netsh dns show encryption server=223.5.5.5
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;IPV6同理，不过DoH服务商那么多，还要连着主要次要ipv4/v6都要添加，怕不是一行行打手都麻了，为此我专门写了一个脚本，自动添加了以下DoH服务商：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;阿里DNS(223.5.5.5/2400:3200::1)&lt;/li&gt;
+&lt;li&gt;DNSPOD(119.29.29.29/2402:4e00::)&lt;/li&gt;
+&lt;li&gt;深信服下一代网络工程IPV6 DoH(仅IPV6:240C::6666)&lt;/li&gt;
+&lt;li&gt;360(仅IPV4:101.226.4.6/123.125.81.6)&lt;/li&gt;
+&lt;li&gt;Adguard(包括多种，&lt;a class="link" href="https://bbs.pcbeta.com/viewthread-1877659-1-1.html" target="_blank" rel="noopener"
+&gt;详细官网查看&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;下载后&lt;strong&gt;请使用右击，以管理员权限运行&lt;/strong&gt;,&lt;a class="link" href="https://takuron.lanzoui.com/b0as59z2f" target="_blank" rel="noopener"
+&gt;蓝奏云下载地址（提取码h6e1）&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;可以看到添加后就能正常使用国内的DoH服务了。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/20250827/a06762e22f8c2ba77b4d642eaa0bd5a0.png"
+loading="lazy"
+alt="Snipaste_2021-10-05_13-45-26.png"
+&gt;&lt;/p&gt;</description></item><item><title>Windows系统联网验证策略和“去除叹号”</title><link>https://takuron.com/post/id0022/</link><pubDate>Sat, 21 Nov 2020 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0022/</guid><description>&lt;img src="https://i.loli.net/2020/11/21/VIA9Jxk4ROSF3XG.jpg" alt="Featured image of post Windows系统联网验证策略和“去除叹号”" /&gt;&lt;p&gt;出于你懂得的的原因，在我朝连接国际互联网那叫一个感人。在原生安卓中，就是因为这个众所周知的原因无法正确判断联网状态诞生了“去除叹号”软件。同样的，作为难兄难弟的微软爷不甘示弱。这两天同样的事情发生在了我的Windows电脑上。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/11/21/Pq9cWY3jedNg5nA.png"
+loading="lazy"
+alt="Snipaste_2020-11-21_09-38-13.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;在使用以下方法时，请首先确定这只是“显示错误”，即你已经可以判断你的电脑可以正常连接互联网的情况下还是如此显示并且影响到你对一些应用（例如自带应用商店）的使用。&lt;/p&gt;
+&lt;p&gt;所有的联网验证相关的参数都位于注册表&lt;code&gt;\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet&lt;/code&gt;当中，这里以我正在使用的Windows10 20H2为例：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/11/21/aYfUbPrgCdHkxTm.png"
+loading="lazy"
+alt="Snipaste_2020-11-21_09-47-10.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;这就很明了了，直接说解决方案。&lt;/p&gt;
+&lt;h2 id="直接关闭整个验证"&gt;直接关闭整个验证
+&lt;/h2&gt;&lt;p&gt;如果你在用一个台式机，联网验证对你来说完全没用（自家路由器难道还有需要登录的？），那么你可以直接关闭这个功能，将&lt;code&gt;EnableActiveProbing&lt;/code&gt;参数改为0即可。&lt;/p&gt;
+&lt;h2 id="验证dns是否正常"&gt;验证DNS是否正常
+&lt;/h2&gt;&lt;p&gt;如果你是笔记本，只想修好这个功能而不是一股脑的关死，那么电脑会首先确定你的ISP有没有给你的DNS投毒。以我目前的参数设置为例，在powershell里面查询：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;nslookup dns.msftncsi.com
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;其中被查询的域名是你注册表中&lt;code&gt;ActiveDnsProbeHost&lt;/code&gt;的值。Windows会验证DNS查询到的结果是否和&lt;code&gt;ActiveDnsProbeContent&lt;/code&gt;的值相同，v6同理。如果你返回的是类似于127.0.0.1这种解析结果，恭喜你被DNS投毒了。本人遇到的就是这种情况（PS：阿里的DNS都能间歇性投毒我想说什么不用讲了吧），但我在用AdGuardHome，所以加个重写就解决了。&lt;/p&gt;
+&lt;p&gt;如果你没有用这类软件，并且你不想通过改写host这种自欺欺人的手段来解决问题，那么你可以将被查询的域名换成阿里dns的域名&lt;code&gt;dns.alidns.com&lt;/code&gt;，大多数情况下，其结果总对应其DNS服务器IP&lt;code&gt;223.5.5.5&lt;/code&gt;、&lt;code&gt;2400:3200::1&lt;/code&gt;，可以将对应值修改后以此验证。&lt;/p&gt;
+&lt;h2 id="验证http访问是否正常"&gt;验证HTTP访问是否正常
+&lt;/h2&gt;&lt;p&gt;然后电脑会确定你的HTTP服务是否正常，其会向&lt;code&gt;ActiveWebProbeHost&lt;/code&gt;对应的服务器请求一个&lt;code&gt;connecttest.txt&lt;/code&gt;的文本文件，然后确认其值是否与&lt;code&gt;ActiveWebProbeContent&lt;/code&gt;相等。以我目前的配置为例，这相当于：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/11/21/MQDkIs74zLWE6lp.png"
+loading="lazy"
+alt="Snipaste_2020-11-21_10-27-38.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;解决的方法有很多，DNS投毒同样会影响这个的验证结果（并且这种情况导致的验证失败非常常见），可以先尝试上述方法。&lt;/p&gt;
+&lt;p&gt;若仍无效或者是希望彻底解决问题，用gitee page自建一个测试服务器并不是一个完美的解决方案，因为无法判断ipv4联通还是ipv6连通，&lt;strong&gt;此处待大佬解决&lt;/strong&gt;。&lt;/p&gt;
+&lt;h2 id="总结"&gt;总结
+&lt;/h2&gt;&lt;p&gt;整体来说微软的验证大多数时候还是有效的，如果偶尔出现了不可用的状况可以按照本文进行修改解决。&lt;/p&gt;</description></item><item><title>以最简单的方式改进自己电脑的DNS</title><link>https://takuron.com/post/id0019/</link><pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0019/</guid><description>&lt;img src="https://i.loli.net/2020/05/10/VnFD2HCmewfQuY4.jpg" alt="Featured image of post 以最简单的方式改进自己电脑的DNS" /&gt;&lt;p&gt;以今天的标准来看，1997年互联网上的信息获取是十分低效的。搜索引擎刚刚起步，网站数目少，甚至在网上发布信息的人都寥寥无几，且当年的信息传递方法绝大多数已经被淘汰。而身处2020年的我们，为什么比以前更需要来自上个世纪的RSS了呢？&lt;/p&gt;
+&lt;h3 id="主流信息获取的问题"&gt;主流信息获取的问题
+&lt;/h3&gt;&lt;p&gt;说到信息获取，很多人首先会想到网页。的确现代网页能够完成对各种信息的精确表达，但人们会忽视一个关键点，那就是&lt;strong&gt;在信息爆炸的时代，我们更需要将自己有限的时间留给获取信息本身&lt;/strong&gt;，而这在2020年的网页里面，在很多时候，我们仍然做不到：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/05/22/Cp18K5H9eshiumF.jpg"
+loading="lazy"
+alt="Snipaste_2020-05-22_11-39-38-jpg.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;是的，他们不仅是添加广告，他们还会用要素过多的页面元素来影响你信息的获取，你需要拨开层层遮罩才能看到你需要的信息。如果你使用的是手机，那么恭喜你，你可能连网页都打不开，因为.&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/05/22/MjiurcRlSeX1B4J.jpg"
+loading="lazy"
+alt="photo_2020-05-22_18-14-30.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;然后就是：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/05/22/BbJusGERrPqQanU.jpg"
+loading="lazy"
+alt="photo_2020-05-22_18-16-58.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;流量至上的时代，每个平台都试图在圈地运动中试图把用户困在自己的小圈子里面，像填鸭一样推送着自己想让用户知道的信息，并且&lt;strong&gt;这些信息就和骚扰电话一样是主动式的&lt;/strong&gt;，处理信息变成了被信息“填鸭”是现在许多互联网用户的悲哀。&lt;/p&gt;
+&lt;p&gt;这也引申出第二个问题，在APP里面浏览会留下记录。在经过分析和在各个应用肮脏的py交易中随意交易后我们的隐私荡然无存，最后变成让人可怕的服务推荐。就我个人而言，我希望保持“高冷”，&lt;strong&gt;不希望在我的信息浏览中留下任何关于我的喜好的信息交给互联网公司随意分析&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;最后，目前的推送系统大多数是“正反馈”的：用户喜欢看什么、就给用户推送什么以此一步步给用户打上标签。但我们常说兼听则明和忠言逆耳，&lt;strong&gt;真正客观的信息难以从讨好你的推荐算法中获取&lt;/strong&gt;，这也一定程度上促进了目前互联网ETC横飞，网络战争日日不休。&lt;/p&gt;
+&lt;h3 id="rss的优势"&gt;RSS的优势
+&lt;/h3&gt;&lt;p&gt;RSS(Really Simple Syndication)是一种描述和同步网站内容的格式，是使用最广泛的XML应用。简单来说就是：将信息以约定的格式传递给用户，然后用户通过其他软件解析并且阅读。除了最简单的排版格式以外几乎没有其他内容的RSS在10年前都会被称为鸡肋，但现在看来，它一口气解决了几乎所有上述痛点。&lt;/p&gt;
+&lt;p&gt;首先由于只有基本的排版元素，所以实际呈现给用户的内容基本靠第三方软件完成解析，并且一个合适的第三方软件可以简明高效的显示多个来源的信息而不必看乱七八糟的广告和适应各个网页的排版，&lt;strong&gt;让你不必在乎网页和APP的差异而关注信息本身&lt;/strong&gt;。另外由于你的信息是一次性拉取的，网站无法得到你的阅读反馈，自然也就&lt;strong&gt;无法对你关注的点进行分析&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;而且大多数网站的RSS都是提供的首页订阅，也就是仅仅按照热度和时间顺序给你推送，任何人都会拿到一模一样的信息，&lt;strong&gt;你得到的信息更加客观而不会局限于你的偏好导致的推荐信息失真&lt;/strong&gt;。最后，除了一些设置自动更新的软件会主动推送外，&lt;strong&gt;一般情况下RSS的刷新是被动的&lt;/strong&gt;，也就是说是你阅读的信息而不是信息让你阅读，这才是一种良性的信息获取。&lt;/p&gt;
+&lt;p&gt;有人要说了，如果我希望得到一些个性的的信息呢？一些第三方平台例如Inoreader可以提供订阅源的筛选服务，可以按照你规定的规则对信息进行初筛，提高你的信息获取效率。&lt;/p&gt;
+&lt;h3 id="那你能帮帮我吗"&gt;那你能帮帮我吗？
+&lt;/h3&gt;&lt;p&gt;这里推荐&lt;a class="link" href="https://sspai.com/post/56391" target="_blank" rel="noopener"
+&gt;高效获取信息，你需要这份 RSS 入门指南——少数派&lt;/a&gt;，里面基本涵盖了通过接入服务来阅读RSS的方法，不过个人更喜欢脱离具体平台的本地软件，所以我推荐Windows平台的&lt;a class="link" href="https://quiterss.org/" target="_blank" rel="noopener"
+&gt;QuiteRSS&lt;/a&gt;和Android上的&lt;a class="link" href="https://www.coolapk.com/apk/com.blend.rolly" target="_blank" rel="noopener"
+&gt;Rolly RSS Reader&lt;/a&gt; 。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/05/22/jEHheQqSo9rvwlN.png"
+loading="lazy"
+alt="Snipaste_2020-05-22_19-10-02.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/05/22/wopH1XE354cPfRU.jpg"
+loading="lazy"
+alt="photo_2020-05-22_19-15-34.jpg"
+&gt;&lt;/p&gt;
+&lt;h3 id="总结"&gt;总结
+&lt;/h3&gt;&lt;p&gt;RSS会不会复兴？即使是很多资深的订阅者也看衰RSS的前途，缺少更多的多媒体呈现方式和不够智能化和集中化的订阅方式的确不再适合当前的互联网环境，如果问我，我也不会认为这种东西将会成为主流。那么为何我仍然会选择这种方式？&lt;strong&gt;因为在面对觊觎我个人喜好和把各种网络服务打成大礼包一股脑地砸在我头上的无良互联网公司，只有使用这种原始化的信息获取方式才能保留作为用户的尊严。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;PS：本站已经支持&lt;a class="link" href="https://takuron.top/feed.xml" target="_blank" rel="noopener"
+&gt;RSS订阅&lt;/a&gt;。&lt;/p&gt;</description></item></channel></rss>

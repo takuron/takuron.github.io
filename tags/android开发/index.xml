@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Android开发 on Takuron</title><link>https://takuron.com/tags/android%E5%BC%80%E5%8F%91/</link><description>Recent content in Android开发 on Takuron</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Thu, 23 Nov 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://takuron.com/tags/android%E5%BC%80%E5%8F%91/index.xml" rel="self" type="application/rss+xml"/><item><title>Android 13中使用Intent传输Parcelable对象为空的解决方式</title><link>https://takuron.com/post/id0025/</link><pubDate>Thu, 23 Nov 2023 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0025/</guid><description>&lt;img src="https://img.takuron.com/20250827/1e7bc2d1c52123042ccb528e7263e7ca.webp" alt="Featured image of post Android 13中使用Intent传输Parcelable对象为空的解决方式" /&gt;&lt;h2 id="背景介绍"&gt;背景介绍
+&lt;/h2&gt;&lt;h3 id="intent对象传递与序列化"&gt;Intent对象传递与序列化
+&lt;/h3&gt;&lt;p&gt;为了在Android各大组件之间通信跳转，Intent是最常用的通信手段。其中我们可以在其中的extra里面添加一些简单数据随其传递到下一个组件。为了向其中写入对象数据，我们需要将对象转变成可以保存和传输的二进制格式，即序列化过程。Android Intent允许传递继承Serializable和Parcelable的可序列化对象。
+Serializable为Java原生的可序列化接口，只需继承自空的Serializable接口即可实现整个对象的序列化，但其序列化的实现使用了Java的反射机制且会对整个类的全部数据进行序列化，效率非常低。Parcelable则是Android专门设计的序列化接口，其需要自行实现序列化和反序列化的方法，其优点自然是&lt;a class="link" href="go?url=https://www.developerphil.com/parcelable-vs-serializable/" &gt;整体效率可以接近十倍于Serializable&lt;/a&gt;，缺点自然是实现的时候需要写大量格式化的代码，以下是java中的一个例子：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;span class="lnt"&gt;17
+&lt;/span&gt;&lt;span class="lnt"&gt;18
+&lt;/span&gt;&lt;span class="lnt"&gt;19
+&lt;/span&gt;&lt;span class="lnt"&gt;20
+&lt;/span&gt;&lt;span class="lnt"&gt;21
+&lt;/span&gt;&lt;span class="lnt"&gt;22
+&lt;/span&gt;&lt;span class="lnt"&gt;23
+&lt;/span&gt;&lt;span class="lnt"&gt;24
+&lt;/span&gt;&lt;span class="lnt"&gt;25
+&lt;/span&gt;&lt;span class="lnt"&gt;26
+&lt;/span&gt;&lt;span class="lnt"&gt;27
+&lt;/span&gt;&lt;span class="lnt"&gt;28
+&lt;/span&gt;&lt;span class="lnt"&gt;29
+&lt;/span&gt;&lt;span class="lnt"&gt;30
+&lt;/span&gt;&lt;span class="lnt"&gt;31
+&lt;/span&gt;&lt;span class="lnt"&gt;32
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;static class Skill implements Parcelable {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; String name;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; boolean programmingRelated;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Skill(Parcel in) {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; this.name = in.readString();
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; this.programmingRelated = (in.readInt() == 1);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @Override
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; void writeToParcel(Parcel dest, int flags) {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; dest.writeString(name);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; dest.writeInt(programmingRelated ? 1 : 0);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; static final Parcelable.Creator&amp;lt;Skill&amp;gt; CREATOR
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; = new Parcelable.Creator&amp;lt;Skill&amp;gt;() {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Skill createFromParcel(Parcel in) {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; return new Skill(in);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Skill[] newArray(int size) {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; return new Skill[size];
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; };
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @Override
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; int describeContents() {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; return 0;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; }
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="kotlin的优化"&gt;Kotlin的优化
+&lt;/h3&gt;&lt;p&gt;Kotlin原生引入了data class，并且得益于gradle强大的插件系统。这解决了上面Parcelable接口最大的缺点，我们可以用插件快速为开发中常用的data类实现Parcelable序列化方法，首先在build.gradle里引入插件：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;plugins {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; id(&amp;#34;kotlin-parcelize&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;}&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;然后对需要实现Parcelable接口的数据类使用注释即可：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;@Keep
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;@Parcelize
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;data class PaoModel(
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; val pao_name: String,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; val pao_url:String
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;): Parcelable
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="api33的改动"&gt;API33的改动
+&lt;/h3&gt;&lt;p&gt;Api33以前无论读取那种序列化对象都是直接根据key来获得对象后强转：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;val a:A = activity.intent.extras?.getParcelable(&amp;#34;key1&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;val b:B = activity.intent.extras?.getSerializable(&amp;#34;key2&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;但这样是类型不安全的，为了解决这个问题，Api33以后弃用了上述的方法，改为：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;val a = activity.intent.extras?.getParcelable(&amp;#34;key1&amp;#34;,A::class.java)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;val b = activity.intent.extras?.getSerializable(&amp;#34;key2&amp;#34;,B::class.java)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="问题现象"&gt;问题现象
+&lt;/h2&gt;&lt;p&gt;在实际开发中我使用了Activity A B C，A B两个Activity为唯一跳转Activity C的路径并向其传递了需要展示的对象信息x，接收intent的数据的代码如下：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;if(Build.VERSION.SDK_INT&amp;gt;=Build.VERSION_CODES.TIRAMISU)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; historyData = ac.intent.extras!!getParcelable(AppInfo.INTENT_KEY_RENEYE,LgroModel::class.java)!!
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; else
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; historyData = ac.intent.extras!!.getParcelable&amp;lt;LgroModel&amp;gt;(AppInfo.INTENT_KEY_RENEYE)!!
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;在测试的时候未发现任何问题，于是混淆打包release，出事了，提示空指针。&lt;/p&gt;
+&lt;p&gt;首先考虑混淆导致data类错误和强制非空转换的逻辑问题，但查了半天该keep的都正常keep，逻辑在debug包下无论怎么点都不会有问题。尝试打印传入对象，在release包下依然有效。尝试传递字符串，传递正常。于是问题就变成了为何intent传递对象失效。&lt;/p&gt;
+&lt;h2 id="解决"&gt;解决
+&lt;/h2&gt;&lt;p&gt;问题回到了获取Parcelable对象本身，此时看到为了适配新api做的分支判断，马上掏了个Android 11的手机测试，一切正常，问题看样子出在了新的方法上，遂根据关键词搜索，找到了&lt;a class="link" href="go?url=https://stackoverflow.com/questions/76067109/getparcelable-crashes-due-to-null-iftable-in-agp-8" &gt;Stack Overflow上的这篇文章&lt;/a&gt;,真相大白，解决方案翻译如下：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;我认为这个崩溃是由两个不幸的因素组合在一起引起的。
+AGP 8 默认启用了 R8 的完整模式。R8 的完整模式会剥离默认构造函数并执行更激进的优化。在 API 33 中引入的新的 getParcelable(String, Class) 方法存在一些缺陷，如果 Parcelable 没有以特定方式定义，就会出现问题。&lt;a class="link" href="go?url=https://issuetracker.google.com/issues/274185314" &gt;相关错误的文档&lt;/a&gt;
+看起来 getParcelable(String, Class) 的脆弱实现和 R8 对某些代码进行优化导致了这个崩溃。目前的解决方法似乎是在 API 33 中使用旧的 getParcelable(String) 方法。Google 表示他们已经在 API 34 中修复了 getParcelable(String, Class) 的问题。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;更新：androidx.core:core-ktx:1.10.0 包含了对此问题的修复。它包含了 BundleCompat.getParcelable(Bundle, String, Class)，该方法仅在 Android U 及以上版本上调用新的 getParcelable(Bundle, Class) 函数。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;这个问题只会在使用R8混淆之后才会出现且较难定位。所以为了解决这个问题，现在建议升级AndroidX之后使用其中的方法来获取Parcelable对象。故修改：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;if(Build.VERSION.SDK_INT&amp;gt;=Build.VERSION_CODES.TIRAMISU)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; historyData = BundleCompat.getParcelable(ac.intent.extras!!,AppInfo.INTENT_KEY_RENEYE,LgrolrModel::class.java)!!
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; else
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; historyData = ac.intent.extras!!.getParcelable&amp;lt;LgrolrModel&amp;gt;(AppInfo.INTENT_KEY_RENEYE)!!
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;（后来发现用了兼容库版本判断也是多余的）&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;historyData = BundleCompat.getParcelable(ac.intent.extras!!,AppInfo.INTENT_KEY_RENEYE,LgrolrModel::class.java)!!
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;问题解决&lt;/p&gt;</description></item><item><title>Android studio 2.2.3默认项目状态栏层级错误的解决方案</title><link>https://takuron.com/post/id0003/</link><pubDate>Sun, 15 Oct 2017 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0003/</guid><description>&lt;p&gt;最近在android studio里新建了一个项目，本来觉得as真的很人性化，给了这么多模板，还都带material design效果，可是当我编译完成后……&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2017/07/30/597d814a7fd92.png"
+loading="lazy"
+alt="597d814a7fd92.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;握草这是什么玩意，最简单的hello world都给我附赠个状态栏层级错误，强迫症表示上面的阴影真的是令人无法忍受啊。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2017/07/30/597d81cc78f57.gif"
+loading="lazy"
+alt="597d81cc78f57.gif"
+&gt;&lt;/p&gt;
+&lt;p&gt;然后找解决方案，国内是完全没有这方面资料（至少我没找到）（国人果然对md还是非常冷淡），英语水平又呵呵的很，所以一等就是好几个月没有理这个bug。&lt;/p&gt;
+&lt;p&gt;前几天和朋友聊起这个bug，他们建议我去stackoverflow 再找找。一开始我是拒绝的，因为我这访问sf奇慢（开网页分钟级），但当他替我搜到时，我就在感叹：国外人真会玩啊。&lt;/p&gt;
+&lt;p&gt;&lt;a class="link" href="https://stackoverflow.com/questions/34891756/toolbars-shadow-on-status-bar-for-lollipop" target="_blank" rel="noopener"
+&gt;stackoverflow原文地址&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;国外dalao提供了四种解决方案，下面我写一下我亲试有效的两种：&lt;/p&gt;
+&lt;h5 id="1去除statusbarcolor"&gt;1.去除statusBarColor
+&lt;/h5&gt;&lt;p&gt;关于这个属性，android官方文档是这么解释的&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;To set a custom color for the status bar, use the android:statusBarColor attribute when you extend the material theme. By default, android:statusBarColor inherits the value of android:colorPrimaryDark.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;本人借助翻译软件的渣翻：要为状态栏设置自定义颜色，可以在扩展主题主题时使用android:statusBarColor属性。默认情况下,android:statusBarColor继承了android的值:colorPrimaryDark。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;也就是说，我们现在需要它是透明的。然而透明是android的默认选项，虽然根据回答者的意思是我们在代码里就设置的是透明，但这完全没有必要，所以，我们应该找到value-v21里的style.xml，把这行：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&amp;lt;item name=&amp;#34;android:statusBarColor&amp;#34;&amp;gt;@android:color/transparent&amp;lt;/item&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;去掉就OK了。&lt;/p&gt;
+&lt;h5 id="2外面加一个linearlayout"&gt;2.外面加一个LinearLayout
+&lt;/h5&gt;&lt;p&gt;很玄的一个方法，然而的确是有效的，不做首要推荐。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2017/07/30/597d89a8f04cb.png"
+loading="lazy"
+alt="597d89a8f04cb.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;（由于简书和我的博客老抽，只好先截图了，具体的可以到原文里查看）&lt;/p&gt;
+&lt;p&gt;以上两种方法处理之后界面就恢复正常了～&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2017/07/30/597d8a0b730c7.png"
+loading="lazy"
+alt="597d8a0b730c7.png"
+&gt;&lt;/p&gt;</description></item><item><title>aide安装m2repository库教程</title><link>https://takuron.com/post/id0001/</link><pubDate>Wed, 11 Oct 2017 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0001/</guid><description>&lt;p&gt;android support一向是Google官方提供给开发者解决应用兼容性和提供官方工具的好东西，这些都打包存在m2repository中。aide支持这个库，不过由于万里长城的影响，aide内置下载是有一定问题的，这里讲讲如何不用梯子下载安装最新版m2repository。&lt;/p&gt;
+&lt;p&gt;首先下载打包版本的m2repository，下载地址（推荐Google官方）：&lt;/p&gt;
+&lt;p&gt;&lt;a class="link" href="https://dl-ssl.google.com/android/repository/android_m2repository_r47.zip" target="_blank" rel="noopener"
+&gt;Google官方（国内已经可用）&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class="link" href="http://android-mirror.bugly.qq.com:8080/android/repository/android_m2repository_r47.zip" target="_blank" rel="noopener"
+&gt;腾讯的国内镜像&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class="link" href="http://mirrors.neusoft.edu.cn/android/repository/android_m2repository_r47.zip" target="_blank" rel="noopener"
+&gt;外国镜像（非常非常慢）&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class="link" href="https://pan.baidu.com/s/1qXD16RM" target="_blank" rel="noopener"
+&gt;百度网盘，提取码0202&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;下载完成后解压。注意：解压的时候最好选择“解压到当前目录”或“解压到指定目录”，如果没有这种选项下一步请保证选择的文件夹名字为“m2repository”。&lt;/p&gt;
+&lt;p&gt;以下以es文件浏览器解压为例，请选择2、3项而不是第一项。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2017/07/25/59771cf2e708b.png"
+loading="lazy"
+alt="59771cf2e708b.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;解压后在aide中找到解压得到的文件夹，复制路径。&lt;/p&gt;
+&lt;p&gt;再次提醒：一定要保证复制路径的是文件夹名字为“m2repository”的文件夹，如果不是，请往里面寻找。&lt;/p&gt;
+&lt;p&gt;最后，在菜单里找到更多〉设置〉构建/运行〉maven仓库目录，把刚刚复制的路径粘贴进去即可。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://ooo.0o0.ooo/2017/07/25/59771e30283c5.png"
+loading="lazy"
+alt="59771e30283c5.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2017/07/25/59771e3d3cff5.png"
+loading="lazy"
+alt="59771e3d3cff5.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;再在项目中引用类似android support v4之类的库，可以看到项目已经正常了。&lt;/p&gt;</description></item></channel></rss>
