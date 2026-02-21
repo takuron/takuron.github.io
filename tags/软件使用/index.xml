@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>软件使用 on Takuron</title><link>https://takuron.com/tags/%E8%BD%AF%E4%BB%B6%E4%BD%BF%E7%94%A8/</link><description>Recent content in 软件使用 on Takuron</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Sat, 10 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://takuron.com/tags/%E8%BD%AF%E4%BB%B6%E4%BD%BF%E7%94%A8/index.xml" rel="self" type="application/rss+xml"/><item><title>使用开源的Gadgetbridge管理小米手环4</title><link>https://takuron.com/post/id0023/</link><pubDate>Sat, 10 Apr 2021 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0023/</guid><description>&lt;img src="https://i.loli.net/2021/04/10/em5ysORGpYJHola.png" alt="Featured image of post 使用开源的Gadgetbridge管理小米手环4" /&gt;&lt;h2 id="前言"&gt;前言
+&lt;/h2&gt;&lt;p&gt;小米手环已经更新到了6，但越看更新越没有换的欲望，手环的功能到现在为止都没有突破性的改变，而手表还是一如既往的耗电。反而是小米运动APP（其实应该是华米的运动APP吧）的广告越来越遭人烦，这让我的视线逐步向第三方的方案转移。虽然在此之前有同为精简第三方的Notify &amp;amp; Fitness for Mi Band，但留一个破解本体还是让人难免不舒服，于是这次转而使用开源的Gadgetbridge，而且说句实话，在整理好的APP帮助下个人认为体验是最好的。&lt;/p&gt;
+&lt;h2 id="安装步骤"&gt;安装步骤
+&lt;/h2&gt;&lt;p&gt;&lt;a class="link" href="https://takuron.lanzous.com/b0armx34f" target="_blank" rel="noopener"
+&gt;备用下载位置&lt;/a&gt;，密码：cug3&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;在官方APP中将手环的账号绑定（完成后可卸载）： &lt;img src="https://i.loli.net/2021/04/10/2W3lUxhYoSRyiHA.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-47-16.jpg"
+&gt;&lt;/li&gt;
+&lt;li&gt;下载&lt;a class="link" href="https://codeberg.org/vanous/huafetcher" target="_blank" rel="noopener"
+&gt;huafetcher&lt;/a&gt;用于获取加密key 。&lt;/li&gt;
+&lt;li&gt;在第二项选择为xiaomi：&lt;img src="https://i.loli.net/2021/04/10/TPrMg1OHoKb6RL8.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-47-38.jpg"
+&gt;&lt;/li&gt;
+&lt;li&gt;选择Get token进入网页，登录小米账号（这里注意修改手机号为+86）：&lt;img src="https://i.loli.net/2021/04/10/pzZSOuPiwDX6HqY.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-47-47.jpg"
+&gt; &lt;img src="https://i.loli.net/2021/04/10/lyeKfqND7PRovrV.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-47-51.jpg"
+&gt;&lt;/li&gt;
+&lt;li&gt;这里会报错，这是正常的，直接复制地址栏所有内容到URL result内：&lt;img src="https://i.loli.net/2021/04/10/j3o2SiMUryEH7IX.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-47-57.jpg"
+&gt; &lt;img src="https://i.loli.net/2021/04/10/hsCqDYbkFyHPUun.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-48-02.jpg"
+&gt;&lt;/li&gt;
+&lt;li&gt;选择“Fetch key”，把下方生成的key复制走（到这里这个APP可以卸载了）&lt;/li&gt;
+&lt;li&gt;下载&lt;a class="link" href="https://codeberg.org/Freeyourgadget/Gadgetbridge" target="_blank" rel="noopener"
+&gt;Gadgetbridge&lt;/a&gt;，进入后点击右下角的“+”，然后搜索你的小米手环：&lt;img src="https://i.loli.net/2021/04/10/3nitAx8zl6vePhp.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-48-15.jpg"
+&gt;&lt;/li&gt;
+&lt;li&gt;这里长按进去，拖到底下，找到认证密钥，输入你刚刚复制的key到里面，回去连接，就可以正常使用了。&lt;img src="https://i.loli.net/2021/04/10/Ww3GpNkdzHTuvPD.jpg"
+loading="lazy"
+alt="photo_2021-04-10_14-48-19.jpg"
+&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;之后只要不动官方APP内的绑定关系就能一直使用了。&lt;/p&gt;
+&lt;h2 id="优劣势对比"&gt;优劣势对比
+&lt;/h2&gt;&lt;p&gt;与小米手环官方APP和小米手环专用的Notify &amp;amp; Fitness for Mi Band比起来，Gadgetbridge有以下优势：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;开源 免费（相对Notify &amp;amp; Fitness for Mi Band） 无广告（相对官方）&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;通用方案，可以同时兼容其他品牌的手环。&lt;/li&gt;
+&lt;li&gt;轻便优雅，官方APP不需要修改不需要保留给爷爬。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;那么，代价是什么呢？&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;缺少对心跳、月经（米环5）等小米手环特色功能的支持&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;更换主题不方便（这个可以用官方APP当工具人）&lt;/li&gt;
+&lt;li&gt;通知管理不太符合个人的使用习惯（个人一般喜欢设置仅聊天手环通知，而这个应用默认·是黑名单模式）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="总结"&gt;总结
+&lt;/h2&gt;&lt;p&gt;AD米一生黑，开源万岁。&lt;/p&gt;</description></item><item><title>Windows系统联网验证策略和“去除叹号”</title><link>https://takuron.com/post/id0022/</link><pubDate>Sat, 21 Nov 2020 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0022/</guid><description>&lt;img src="https://i.loli.net/2020/11/21/VIA9Jxk4ROSF3XG.jpg" alt="Featured image of post Windows系统联网验证策略和“去除叹号”" /&gt;&lt;p&gt;出于你懂得的的原因，在我朝连接国际互联网那叫一个感人。在原生安卓中，就是因为这个众所周知的原因无法正确判断联网状态诞生了“去除叹号”软件。同样的，作为难兄难弟的微软爷不甘示弱。这两天同样的事情发生在了我的Windows电脑上。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/11/21/Pq9cWY3jedNg5nA.png"
+loading="lazy"
+alt="Snipaste_2020-11-21_09-38-13.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;在使用以下方法时，请首先确定这只是“显示错误”，即你已经可以判断你的电脑可以正常连接互联网的情况下还是如此显示并且影响到你对一些应用（例如自带应用商店）的使用。&lt;/p&gt;
+&lt;p&gt;所有的联网验证相关的参数都位于注册表&lt;code&gt;\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet&lt;/code&gt;当中，这里以我正在使用的Windows10 20H2为例：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/11/21/aYfUbPrgCdHkxTm.png"
+loading="lazy"
+alt="Snipaste_2020-11-21_09-47-10.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;这就很明了了，直接说解决方案。&lt;/p&gt;
+&lt;h2 id="直接关闭整个验证"&gt;直接关闭整个验证
+&lt;/h2&gt;&lt;p&gt;如果你在用一个台式机，联网验证对你来说完全没用（自家路由器难道还有需要登录的？），那么你可以直接关闭这个功能，将&lt;code&gt;EnableActiveProbing&lt;/code&gt;参数改为0即可。&lt;/p&gt;
+&lt;h2 id="验证dns是否正常"&gt;验证DNS是否正常
+&lt;/h2&gt;&lt;p&gt;如果你是笔记本，只想修好这个功能而不是一股脑的关死，那么电脑会首先确定你的ISP有没有给你的DNS投毒。以我目前的参数设置为例，在powershell里面查询：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;nslookup dns.msftncsi.com
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;其中被查询的域名是你注册表中&lt;code&gt;ActiveDnsProbeHost&lt;/code&gt;的值。Windows会验证DNS查询到的结果是否和&lt;code&gt;ActiveDnsProbeContent&lt;/code&gt;的值相同，v6同理。如果你返回的是类似于127.0.0.1这种解析结果，恭喜你被DNS投毒了。本人遇到的就是这种情况（PS：阿里的DNS都能间歇性投毒我想说什么不用讲了吧），但我在用AdGuardHome，所以加个重写就解决了。&lt;/p&gt;
+&lt;p&gt;如果你没有用这类软件，并且你不想通过改写host这种自欺欺人的手段来解决问题，那么你可以将被查询的域名换成阿里dns的域名&lt;code&gt;dns.alidns.com&lt;/code&gt;，大多数情况下，其结果总对应其DNS服务器IP&lt;code&gt;223.5.5.5&lt;/code&gt;、&lt;code&gt;2400:3200::1&lt;/code&gt;，可以将对应值修改后以此验证。&lt;/p&gt;
+&lt;h2 id="验证http访问是否正常"&gt;验证HTTP访问是否正常
+&lt;/h2&gt;&lt;p&gt;然后电脑会确定你的HTTP服务是否正常，其会向&lt;code&gt;ActiveWebProbeHost&lt;/code&gt;对应的服务器请求一个&lt;code&gt;connecttest.txt&lt;/code&gt;的文本文件，然后确认其值是否与&lt;code&gt;ActiveWebProbeContent&lt;/code&gt;相等。以我目前的配置为例，这相当于：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/11/21/MQDkIs74zLWE6lp.png"
+loading="lazy"
+alt="Snipaste_2020-11-21_10-27-38.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;解决的方法有很多，DNS投毒同样会影响这个的验证结果（并且这种情况导致的验证失败非常常见），可以先尝试上述方法。&lt;/p&gt;
+&lt;p&gt;若仍无效或者是希望彻底解决问题，用gitee page自建一个测试服务器并不是一个完美的解决方案，因为无法判断ipv4联通还是ipv6连通，&lt;strong&gt;此处待大佬解决&lt;/strong&gt;。&lt;/p&gt;
+&lt;h2 id="总结"&gt;总结
+&lt;/h2&gt;&lt;p&gt;整体来说微软的验证大多数时候还是有效的，如果偶尔出现了不可用的状况可以按照本文进行修改解决。&lt;/p&gt;</description></item><item><title>OBS Studio在笔记本上黑屏问题的解决方案</title><link>https://takuron.com/post/id0016/</link><pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0016/</guid><description>&lt;img src="https://i.loli.net/2020/03/16/yH2f5qGeKJML3Wc.jpg" alt="Featured image of post OBS Studio在笔记本上黑屏问题的解决方案" /&gt;&lt;p&gt;众所周知，笔记本为了兼顾续航采用与传统台式PC不同的显卡使用模式，其中Optimus的确是某种意义上提升了笔记本的续航，但随之而来的就是OBS捕捉不到屏幕画面而彻底黑屏，所以根据Optimus的原理，我们要让OBS强制运行在核显上。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/03/16/5O1dyXYD2qTJMFP.jpg"
+loading="lazy"
+alt="session-attachment-2020-03-16-085157.jpeg"
+&gt;&lt;/p&gt;
+&lt;h2 id="显卡设置中设置强制集成显卡"&gt;显卡设置中设置强制集成显卡
+&lt;/h2&gt;&lt;p&gt;以N卡为例，在右下角托盘找到Nvidia图标，然后显卡驱动中找到管理3D设置-程序设置，添加OBS进来后将其的模式改为集成显卡。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/03/16/Wen52kqViEShBHO.png"
+loading="lazy"
+alt="Snipaste_2020-03-16_08-29-06.png"
+&gt;&lt;/p&gt;
+&lt;h2 id="在windows系统设置里面将obs设置成节能"&gt;在Windows系统设置里面将OBS设置成“节能”
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;这是Win10 1903新出的设置&lt;/strong&gt;，在设置-显示里面寻找图形设置，选择经典应用，添加OBS Studio并将其设置为“节能”，亲测不开这个选项仍然会导致黑屏并且难以直接用核显打开OBS。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/03/16/3qi591mcAGCjv2b.png"
+loading="lazy"
+alt="Snipaste_2020-03-16_08-28-08.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/03/16/isptSqgCBLeX261.png"
+loading="lazy"
+alt="Snipaste_2020-03-16_08-28-25.png"
+&gt;&lt;/p&gt;
+&lt;h2 id="更新到最新版的obs"&gt;更新到最新版的OBS
+&lt;/h2&gt;&lt;p&gt;亲测，OBS最新版完美兼容win10 1909，不需要开启兼容模式，所以建议大家直接去&lt;a class="link" href="https://obsproject.com/" target="_blank" rel="noopener"
+&gt;官网&lt;/a&gt; 下载最新版应用来使用。&lt;/p&gt;
+&lt;p&gt;以上设置后OBS的黑屏问题应该已经解决（主要是网上的教程都没写第二步所以拿来水一下下）&lt;/p&gt;</description></item><item><title>9102年末的个人文件的管理</title><link>https://takuron.com/post/id0014/</link><pubDate>Wed, 25 Dec 2019 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0014/</guid><description>&lt;img src="https://i.loli.net/2020/02/07/ZIndB7rYHxcJEP5.png" alt="Featured image of post 9102年末的个人文件的管理" /&gt;&lt;p&gt;&lt;strong&gt;本人一纯正薅羊毛党，以下内容会涉及一些占用各种（不属于本人的）资源的事情，精神洁癖请主动远离。&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;学计算机救不了没了微信就没法传文件的人。 ——鲁迅&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;估计各位刚入大学的萌新会跟我一样，发现大学最大的麻烦就是：13事多。毕竟高考前不会有人闲的去找高三党做这做那的，但无所事事的大一新生最适合下方工作了。不过这还没完，即使在即将欢送9102年的时候，统计表格的工作在各位老师和班干部的眼里还是这么做的：&lt;/p&gt;
+&lt;p&gt;“大家把表格填一下，回头微信把自己填完的私发给我。”&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/02/07/PkUm7B4W5afrTdg.jpg"
+loading="lazy"
+alt="Screenshot-20191225-091439-01.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;（把全班的整理到一起估计也是逐行复制吧）&lt;/p&gt;
+&lt;p&gt;扯远了，不过这的确在侧面反应出大学生的文件多，设备多，且很多人还在用上世纪的方法进行着管理（或者压根不管理）。这个时候合理的文件管理才能保证我这种人的高效（zhe）率（teng）学习和生活。&lt;/p&gt;
+&lt;h2 id="文件分级"&gt;文件分级
+&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;根据重要程度和私密程度进行分级，这在企业文件管理中非常重要，但是对于个人（尤其是大学生）来说就没有那种重要的感觉，毕竟接触不到什么机密。所以这里我认为&lt;strong&gt;不缺钱随便存，买够正经云空间统统往里面塞是最枯燥的&lt;/strong&gt;。不过有钱估计看到标题就不往下读了，所以我给我的文件分为三类：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;隐私有关的纯文本笔记和除了office套件使用以外的文档，一些（加密后的）密钥文件。&lt;/li&gt;
+&lt;li&gt;隐私有关的图片，音频，视频。&lt;/li&gt;
+&lt;li&gt;隐私无关文件。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这是我的分级，当然各位会比我做得好。&lt;/p&gt;
+&lt;h2 id="u盘"&gt;U盘
+&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;U盘虽然蠢但有用，这是相对于云端存储更可靠，相对于硬盘更便携的数据存储方案，我用的一个64g的，用来处理经常要修改的文档，并且以此为基准修改云端备份。在机房或者某些连不上网的电脑上面，你会感激你的u盘的。&lt;/p&gt;
+&lt;h2 id="坚果云"&gt;坚果云
+&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;这个还是要强力推荐的，webdav协议具有极大的扩展性，配上一些开放的标准（例如keepass，markdown笔记），可以实现自由的多端协作，完爆其他国产云存储十条街，比海外网盘也好不好。不过弊端也很明显：免费版的流量限制，当然这是必须的，毕竟要恰饭的吗。&lt;/p&gt;
+&lt;p&gt;所以我用坚果云存储第一类文件，因为这些文件都很小（纯文本为主），不会像照片一样一旅游照片备份半个月流量没了（说的我经常旅游一样），并且访问速度足够快，不会像onenote一样抽风起来只能拜天求佛。&lt;/p&gt;
+&lt;p&gt;这里我密码管理可以参考&lt;a class="link" href="https://sspai.com/post/55403" target="_blank" rel="noopener"
+&gt;这篇文章&lt;/a&gt;，笔记本我用的&lt;a class="link" href="https://joplinapp.org/" target="_blank" rel="noopener"
+&gt;Joplin&lt;/a&gt;，他们都可以通过坚果云完成多设备同步，方便随时查看。&lt;/p&gt;
+&lt;h2 id="个人onedrive"&gt;个人Onedrive
+&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;我有三个onedrive（会一个个介绍），先说个人的，这是最安全的存储区域，除了阴谋论怀疑微软，基本可以保证数据是安全可控的，可以存储一些隐私和重要资料，并且空间也是相对较大的15g（别问我多的10g哪儿来的，去淘宝买个扩容一起薅巨硬羊毛正解，这个比较靠谱）。不过缺点还是有的：还是不够用，毕竟128g的手机都能被各位塞的满满当当的。&lt;/p&gt;
+&lt;p&gt;这里我主要保存个人照片（同步方式很多），还有一些比较大的非纯文本文档（例如PSD文件，也许更应该归类于图片）。&lt;/p&gt;
+&lt;p&gt;电脑的话如果要上传直接用win10自带客户端同步，手机这里推荐一下&lt;a class="link" href="http://www.tacit.dk/" target="_blank" rel="noopener"
+&gt;FolderSync&lt;/a&gt;，可以定时自动同步一些文件夹，可以保持文件多设备同步。&lt;/p&gt;
+&lt;h2 id="学校onedrive"&gt;学校Onedrive
+&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;来自一个拖各大平台平均水平的大学，学校onedrive没有管理员所以容量是1T。这个不是绝对安全的，因为学校有可能设置管理员或者收走你的学生邮箱，但是一般情况下这也算是个人空间。不过这个网盘还有个问题，为了防止过度分享，没有管理员的onedrive没法接入像上文FolderSync这样的同步软件，难以用来在设备之间同步文件，这就很头疼。我最后的解决方案是利用他做敏感数据冷备盘，定时手动加密数据压缩传进去，并且把一些学习有关的隐私数据放在里面。&lt;/p&gt;
+&lt;h2 id="5t子账号的onedrive"&gt;5T子账号的Onedrive
+&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;不讲具体账号类型，反正不靠谱就完事，但一般那种有管理员权限的个人开放申请的基本都不会跑路，有点良心的也不会经常看你数据，还算是长期有效。这种盘的价值就在于空间足够大，而一般占用空间的也都是一些网上可以公开下载的软件，游戏或者小姐姐。并且这是可以用FolderSync的，所以它理所应当成为了一些非重要数据的桥梁和备份，壁纸啊，视频啊，color图啊。随叫随到，多端备份。&lt;/p&gt;
+&lt;p&gt;甚至可以开&lt;a class="link" href="https://res.takuron.top/" target="_blank" rel="noopener"
+&gt;分享网站&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id="其他的备份"&gt;其他的备份
+&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;当然，有人得说了，微软跑路我不得凉凉？首先，我电脑手机分别本地都有备份，而且……&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/02/07/DcbBsIhJu1P3285.jpg"
+loading="lazy"
+alt="IMG-20191225-153328-01.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;冷盘备份了解一下。&lt;/p&gt;
+&lt;h2 id="总结"&gt;总结
+&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;经过不懈的努（zhe）力（teng），现在终于做到哪儿都能找到备份文件了，251试炼能活下来了（跑）。基本上找我存过的文件可以做到在任意设备三十秒内找到，合理的文件管理会给寻找文件带来方便的同时还能边喝水边看微信找文件的同学。算是一次有成果的折腾&lt;/p&gt;</description></item><item><title>ACG原图搜索与放大技巧--让你看到的每张图都达到壁纸级的清晰度</title><link>https://takuron.com/post/id0012/</link><pubDate>Sun, 26 Aug 2018 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0012/</guid><description>&lt;img src="https://img.takuron.com/blogpost/6897991-bf639bc4390b912e-tuya.webp" alt="Featured image of post ACG原图搜索与放大技巧--让你看到的每张图都达到壁纸级的清晰度" /&gt;&lt;blockquote&gt;
+&lt;p&gt;2025-04-27更新：修复了图片无法显示的问题。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;PS：本来不想写这个文章的，对于搜图大佬来说以下都是火星万年的技巧，不过当我每次看到有些人拿着已经被压绿的图往自己的空间相册发&amp;hellip;&amp;hellip;求求你了学一学怎么找原图吧，好好的图被你糟蹋了。&lt;/p&gt;
+&lt;p&gt;很多人（我是指喜欢ACG圈的人）很多时候都有这种经历，随便逛贴吧b站之类的网站时突然看到一张图（以下是示例）：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/6897991-04bf80a652ee7581-tuya.webp"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;哇好可爱我要抱回家&amp;hellip;&amp;hellip;不对是设置为壁纸，不过很明显，这种情况下找回来的大部分都不是原图，基本都是经过二次加工后的图片当表情包使。就算是原图在贴吧等的压图下质量也会大幅度下降（贴吧压图鸭绿江了解一下，五十次重复压缩后贴吧会把图变成全绿），所以我们要的就是提高图片的清晰度。&lt;/p&gt;
+&lt;h2 id="寻找原图"&gt;寻找原图
+&lt;/h2&gt;&lt;p&gt;很多人上来就放大图片，这是不对的，因为放大图片毕竟是计算机自动补齐放大的像素，不如画师自己画出来的完美。还有人告诉我百度/Google搜图净是瞎出结果，的确这两者在搜索ACG图片时，它的结果并不准确，很多搜索出来的也不是原图，所以本人推荐以下两个搜索ACG原图的网站：&lt;/p&gt;
+&lt;p&gt;&lt;a class="link" href="http://www.iqdb.org/" target="_blank" rel="noopener"
+&gt;Multi-service（iqdb）&lt;/a&gt; &lt;a class="link" href="https://saucenao.com/" target="_blank" rel="noopener"
+&gt;SauceNAO&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;其中前者主要搜索各大转载站，后者则主要搜索p站之类的原创站。Android手机可以使用以下使用这两个网站搜索的应用&lt;a class="link" href="https://www.coolapk.com/apk/rikka.searchbyimage" target="_blank" rel="noopener"
+&gt;以图搜图&amp;ndash;酷安&lt;/a&gt;，将来源设置成对应网站可以达到同样效果。&lt;/p&gt;
+&lt;p&gt;搜索结果如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/6897991-e730ccdb7c2ee537-tuya.webp"
+loading="lazy"
+alt="6897991-e730ccdb7c2ee537.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/6897991-a435f5d530ea8126-tuya.webp"
+loading="lazy"
+alt="6897991-e730ccdb7c2ee537.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;p站原图，分辨率800*570：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/6897991-75ae2f6d6ac2b38c-tuya.webp"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;可以看出两个网站都精确地找到了原图，一个来自转载站一个来自p站。一般情况下，公开发布的图片在这两个网站都是搜到原图。可是这张同人图在p站分享的时候清晰度就不算特别高，即使是原图也达不到壁纸标准，那么就需要第二步：放大图片了。&lt;/p&gt;
+&lt;h2 id="图片超分"&gt;图片超分
+&lt;/h2&gt;&lt;p&gt;假如没有搜到原图或者第一步找到的原图依旧不满意，就需要对图片进行放大。注意，这里的放大不是简单的调整图片大小，所以这里有专门的网站对图片进行放大处理，防止出现锯齿。&lt;/p&gt;
+&lt;p&gt;&lt;a class="link" href="http://waifu2x.udp.jp/" target="_blank" rel="noopener"
+&gt;waifu2x&lt;/a&gt;是专门放大ACG图片的网站，可以自动调整ACG图片避免锯齿，Android软件&lt;a class="link" href="https://www.coolapk.com/apk/com.tsukiseele.waifu2x" target="_blank" rel="noopener"
+&gt;Waifu2x-图片放大&amp;ndash;酷安&lt;/a&gt;可以达到同样的效果，其原理是使用卷积神经网络对动漫风格的图片进行放大操作，也就是自动计算放大后的图片缺失像素的形状。放大的时候需要将放大倍数调整为2，以下是示例图片放大的结果（大图，流量党小心）：&lt;/p&gt;
+&lt;p&gt;放大第一次，分辨率1600*1140&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/6897991-86837075e7707a6b-tuya.webp"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;放大第二次，分辨率3200*2280&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/6897991-bf639bc4390b912e-tuya.webp"
+loading="lazy"
+&gt;&lt;/p&gt;
+&lt;p&gt;可以看出两次放大后仍然看不出任何处理过的痕迹（至少我看不出），而原本分辨率不佳的图片已经清晰到足够设置为壁纸了（我反正够了，不知道有没有用4k屏的），理论上这个网站可以把任何分辨率不佳的ACG图片放大到壁纸级别，不过亲测自地三次（放大8倍）或者第四次（放大16倍）时就会出现一些处理痕迹，所以说：尽量搜索原图吧。&lt;/p&gt;
+&lt;h2 id="三以图搜番"&gt;三、以图搜番
+&lt;/h2&gt;&lt;p&gt;这个介绍算是附赠。嘛，假如你觉得你得到的图是来自某个动漫又不知道是什么动漫的时候这个网站就有作用了&lt;a class="link" href="https://whatanime.ga" target="_blank" rel="noopener"
+&gt;whatanime&lt;/a&gt;是用来根据截图搜索对应动漫的网站，只要你的截图是动漫某一帧的截屏，它在大部分时间都能准确告诉你来源和对于集数。Android系统可以用&lt;a class="link" href="https://takuron.top/go?url=https://www.coolapk.com/apk/pw.janyo.whatanime" target="_blank" rel="noopener"
+&gt;WhatAnime - 以图搜番&amp;ndash;酷安&lt;/a&gt;软件达到同样效果。&lt;/p&gt;
+&lt;p&gt;以下是本人用冷番测试的结果，可以说是完美。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/6897991-af2c9896d802b8e0-tuya.webp"
+loading="lazy"
+alt="6897991-af2c9896d802b8e0.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/6897991-d527e378df5fcf39-tuya.webp"
+loading="lazy"
+alt="6897991-a435f5d530ea8126-tuya"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/6897991-15ad8faa62e21df9-tuya.webp"
+loading="lazy"
+alt="6897991-15ad8faa62e21df9.jpg"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/6897991-87fe8e43ccd714b2-tuya.webp"
+loading="lazy"
+alt="6897991-87fe8e43ccd714b2.jpg"
+&gt;&lt;/p&gt;
+&lt;h2 id="哦还有一件事"&gt;哦，还有一件事
+&lt;/h2&gt;&lt;p&gt;各位大神转图的时候请注意版权问题，提高版权意识，&lt;strong&gt;p站转图是需要标画师和id的&lt;/strong&gt;，请尊重画师的劳动成果。&lt;/p&gt;
+&lt;p&gt;本文示例图p站id&lt;a class="link" href="https://www.pixiv.net/member_illust.php?mode=medium&amp;amp;illust_id=65499784" target="_blank" rel="noopener"
+&gt;65499784&lt;/a&gt;，画师&lt;a class="link" href="https://www.pixiv.net/member.php?id=4179" target="_blank" rel="noopener"
+&gt;プリンプリン&lt;/a&gt;&lt;/p&gt;</description></item></channel></rss>

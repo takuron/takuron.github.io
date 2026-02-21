@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>OBS Studio on Takuron</title><link>https://takuron.com/tags/obs-studio/</link><description>Recent content in OBS Studio on Takuron</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Mon, 16 Mar 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://takuron.com/tags/obs-studio/index.xml" rel="self" type="application/rss+xml"/><item><title>OBS Studio在笔记本上黑屏问题的解决方案</title><link>https://takuron.com/post/id0016/</link><pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0016/</guid><description>&lt;img src="https://i.loli.net/2020/03/16/yH2f5qGeKJML3Wc.jpg" alt="Featured image of post OBS Studio在笔记本上黑屏问题的解决方案" /&gt;&lt;p&gt;众所周知，笔记本为了兼顾续航采用与传统台式PC不同的显卡使用模式，其中Optimus的确是某种意义上提升了笔记本的续航，但随之而来的就是OBS捕捉不到屏幕画面而彻底黑屏，所以根据Optimus的原理，我们要让OBS强制运行在核显上。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/03/16/5O1dyXYD2qTJMFP.jpg"
+loading="lazy"
+alt="session-attachment-2020-03-16-085157.jpeg"
+&gt;&lt;/p&gt;
+&lt;h2 id="显卡设置中设置强制集成显卡"&gt;显卡设置中设置强制集成显卡
+&lt;/h2&gt;&lt;p&gt;以N卡为例，在右下角托盘找到Nvidia图标，然后显卡驱动中找到管理3D设置-程序设置，添加OBS进来后将其的模式改为集成显卡。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/03/16/Wen52kqViEShBHO.png"
+loading="lazy"
+alt="Snipaste_2020-03-16_08-29-06.png"
+&gt;&lt;/p&gt;
+&lt;h2 id="在windows系统设置里面将obs设置成节能"&gt;在Windows系统设置里面将OBS设置成“节能”
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;这是Win10 1903新出的设置&lt;/strong&gt;，在设置-显示里面寻找图形设置，选择经典应用，添加OBS Studio并将其设置为“节能”，亲测不开这个选项仍然会导致黑屏并且难以直接用核显打开OBS。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/03/16/3qi591mcAGCjv2b.png"
+loading="lazy"
+alt="Snipaste_2020-03-16_08-28-08.png"
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://i.loli.net/2020/03/16/isptSqgCBLeX261.png"
+loading="lazy"
+alt="Snipaste_2020-03-16_08-28-25.png"
+&gt;&lt;/p&gt;
+&lt;h2 id="更新到最新版的obs"&gt;更新到最新版的OBS
+&lt;/h2&gt;&lt;p&gt;亲测，OBS最新版完美兼容win10 1909，不需要开启兼容模式，所以建议大家直接去&lt;a class="link" href="https://obsproject.com/" target="_blank" rel="noopener"
+&gt;官网&lt;/a&gt; 下载最新版应用来使用。&lt;/p&gt;
+&lt;p&gt;以上设置后OBS的黑屏问题应该已经解决（主要是网上的教程都没写第二步所以拿来水一下下）&lt;/p&gt;</description></item></channel></rss>
