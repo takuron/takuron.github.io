@@ -2,7 +2,7 @@
 title: ArchLinux折腾记录01：安装
 description: 本系列用于聚合本人安装使用ArchLinux过程中遇到的一些问题。第一篇就从重新安装ArchLinux的记录开始。
 slug: id0032
-date: 2025-08-19 00:00:00+0000
+date: 2026-02-21 00:00:00+0000
 image: https://img.takuron.com/20250827/fd891f4ceba3bd23434784b7077c9044.webp
 categories:
   - ArchLinux
@@ -13,6 +13,8 @@ weight: 1       # You can add weight to some posts to override the default sorti
 ---
 
 本系列用于聚合本人安装使用ArchLinux过程中遇到的一些问题。第一篇就从重新安装ArchLinux的记录开始，本人主要的安装过程请参考[archlinux 简明指南](https://arch.icekylin.online/)，本文也会以其的指导为基础主要列出一些本人的一些个性化配置。
+
+> 2026/02/21 更新Gnome安装为wayland。
 
 ## 基础安装
 
@@ -86,10 +88,10 @@ sudo pacman -S noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra
 - [ArchLinux安装GNOME桌面 - Skyone Blog](https://blog.skyone.dev/2023/archlinux-gnome/)
 - [ArchLinux-GNOME的安装、配置和美化 - 简书](https://www.jianshu.com/p/9f5710d454b6)
 
-安装xorg
+由于Gnome已经完全转向wayland，所以我们不再安装xorg，按以下命令安装 mesa 和 xwayland 用于兼容旧有的xwindow程序。
 
 ```
-sudo pacman -S xorg xorg-server xorg-xinit
+sudo pacman -S mesa xorg-xwayland
 ```
 
 安装gnome，其中gnome里面可以全装（你都选gnome了也不会太在乎这些基础功能是否精简干净了吧），但gnome-extra里面有大量没用的游戏、效率工具等内容，可以直接选择不装或者只挑有用的进行安装，一定一定要挑一下别学我直接一口气给我装了十个游戏。
@@ -169,7 +171,7 @@ paru -S ttf-roboto noto-fonts noto-fonts-cjk adobe-source-han-sans-cn-fonts adob
 ```
 然后我们修改`~/.config/fontconfig/fonts.conf`，以下是我根据配置建议写的Android字体配置，其中为了美观仍然选择的noto sans ckj sc为中文字体，并改用了maple系为等宽字体，这里也可以选择按上面网址里的配置修复Bug：
 
-```
+```xml
 <?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
 <fontconfig>
@@ -336,6 +338,36 @@ paru -S ttf-roboto noto-fonts noto-fonts-cjk adobe-source-han-sans-cn-fonts adob
   </config>
 </fontconfig>
 ```
+
+### 安装雾凇拼音
+
+- [Rime-ice配置 - ArchLinux](https://github.com/iDvel/rime-ice#arch-linux)
+- [Rime 配置文件 - 補靪](https://github.com/iDvel/rime-ice#arch-linux)
+
+雾凇拼音是 Rime 的一份配置仓库，用户需要下载 各平台对应的前端，并将此配置应用到配置目录。 雾凇拼音提供了一套开箱即用的完整配置，包含输入方案（全拼、常见双拼）、长期维护的开源词库及各项扩展功能。
+
+通过以下命令安装雾凇拼音的文件：
+
+```shell
+paru -S rime-ice-git
+```
+
+编辑'$HOME/.config/ibus/rime/'文件，添加如下内容：
+
+```yaml
+patch:
+  # 仅使用「雾凇拼音」的默认配置，配置此行即可
+  __include: rime_ice_suggestion:/
+  # 以下根据自己所需自行定义，非必须内容，仅做参考。
+  # 针对对应处方的定制条目，请使用 <recipe>.custom.yaml 中配置，例如 rime_ice.custom.yaml
+  __patch:
+    key_binder/bindings/+:
+      # 开启逗号句号翻页
+      - { when: paging, accept: comma, send: Page_Up }
+      - { when: has_menu, accept: period, send: Page_Down }
+```
+
+切换输入法到rime，等待重新构建输入方案后就可以使用雾凇拼音了。
 
 ### TCP调参
 
