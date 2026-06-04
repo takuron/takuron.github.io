@@ -2,6 +2,10 @@
 title: Links
 license: false
 links:
+  - title: Takuron's Archive
+    description: 个人文章公开收藏站
+    website: https://archive.takuron.com/
+    image: archive.png
   - title: Tatools
     description: 个人开发使用的网页工具合集
     website: https://tatools.takuron.com/
