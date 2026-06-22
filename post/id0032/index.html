@@ -1,0 +1,484 @@
+<!doctype html><html lang=zh-CN dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="本系列用于聚合本人安装使用ArchLinux过程中遇到的一些问题。第一篇就从重新安装ArchLinux的记录开始。"><title>ArchLinux折腾记录01：安装</title><link rel=canonical href=https://takuron.com/post/id0032/><link rel=stylesheet href=/scss/style.min.86591c898bd806857815fbb8c47e8d3fed97c133b78e83d9bfc27b164dd0aa2b.css><meta property='og:title' content="ArchLinux折腾记录01：安装"><meta property='og:description' content="本系列用于聚合本人安装使用ArchLinux过程中遇到的一些问题。第一篇就从重新安装ArchLinux的记录开始。"><meta property='og:url' content='https://takuron.com/post/id0032/'><meta property='og:site_name' content='Takuron'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Linux'><meta property='article:tag' content='ArchLinux'><meta property='article:published_time' content='2026-02-21T00:00:00+00:00'><meta property='article:modified_time' content='2026-02-21T00:00:00+00:00'><meta property='og:image' content='https://img.takuron.com/20250827/fd891f4ceba3bd23434784b7077c9044.webp'><meta name=twitter:title content="ArchLinux折腾记录01：安装"><meta name=twitter:description content="本系列用于聚合本人安装使用ArchLinux过程中遇到的一些问题。第一篇就从重新安装ArchLinux的记录开始。"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content='https://img.takuron.com/20250827/fd891f4ceba3bd23434784b7077c9044.webp'><link rel="shortcut icon" href=/favicon.png></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_90fdeae1237ec655.jpg width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>Takuron</a></h1><h2 class=site-description>间歇性踌躇满志，持续性混吃等死。</h2></div></header><ol class=menu-social><li><a href=https://space.bilibili.com/11680006 target=_blank title=Bilibili rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-bilibili"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 10a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4H7a4 4 0 01-4-4v-6z"/><path d="M8 3l2 3"/><path d="M16 3l-2 3"/><path d="M9 13v-2"/><path d="M15 11v2"/></svg></a></li><li><a href=mailto:recevier0612@takuron.com target=_blank title=Email rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path d="M3 7l9 6 9-6"/></svg></a></li><li><a href=https://github.com/takuron target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://wxw.moe/@takuron target=_blank title=Mastodon rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-mastodon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18.648 15.254C16.832 17.017 12 16.88 12 16.88a18.262 18.262.0 01-3.288-.256c1.127 1.985 4.12 2.81 8.982 2.475-1.945 2.013-13.598 5.257-13.668-7.636L4 10.309c0-3.036.023-4.115 1.352-5.633C7.023 2.766 12 3.01 12 3.01s4.977-.243 6.648 1.667C19.977 6.195 20 7.274 20 10.31s-.456 4.074-1.352 4.944z"/><path d="M12 11.204V8.278C12 7.02 11.105 6 10 6S8 7.02 8 8.278V13m4-4.722C12 7.02 12.895 6 14 6s2 1.02 2 2.278V13"/></svg></a></li><li><a href=/index.xml target=_blank title=Rss rel=me><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-rss"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 19m-1 0a1 1 0 102 0 1 1 0 10-2 0"/><path d="M4 4a16 16 0 0116 16"/><path d="M4 11a9 9 0 019 9"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li><a href=/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li><a href=https://www.travellings.cn/go.html target=_blank><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-train"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M21 13c0-3.87-3.37-7-10-7H3"/><path d="M3 15h16a2 2 0 002-2"/><path d="M3 6v5h17.5"/><path d="M3 11v4"/><path d="M8 11V6"/><path d="M13 11V6.5"/><path d="M3 19h18"/></svg>
+<span>Travelling</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>暗色模式</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#基础安装>基础安装</a><ol><li><a href=#nvme硬盘的先进格式化与4kn模式>Nvme硬盘的先进格式化与4kn模式</a></li></ol></li><li><a href=#显卡驱动与桌面环境>显卡驱动与桌面环境</a><ol><li><a href=#软件安装的一些小调整>软件安装的一些小调整</a></li><li><a href=#gnome和中文输入法>Gnome和中文输入法</a></li></ol></li><li><a href=#美化与完善>美化与完善</a><ol><li><a href=#语言与地区设置>语言与地区设置</a></li><li><a href=#中文字体完善>中文字体完善</a></li><li><a href=#安装雾凇拼音>安装雾凇拼音</a></li><li><a href=#tcp调参>TCP调参</a></li><li><a href=#gnome插件推荐>Gnome插件推荐</a></li></ol></li><li><a href=#常用软件>常用软件</a><ol><li><a href=#防火墙>防火墙</a></li><li><a href=#java环境>Java环境</a></li><li><a href=#intellij-idea系ide的安装>intellij-idea系IDE的安装</a></li><li><a href=#其他常用软件>其他常用软件</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/post/id0032/><img src=https://img.takuron.com/20250827/fd891f4ceba3bd23434784b7077c9044.webp loading=lazy alt="Featured image of post ArchLinux折腾记录01：安装"></a></div><div class=article-details><header class=article-category><a href=/categories/archlinux/ style=background-color:#1793d1;color:#fff>ArchLinux</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/post/id0032/>ArchLinux折腾记录01：安装</a></h2><h3 class=article-subtitle>本系列用于聚合本人安装使用ArchLinux过程中遇到的一些问题。第一篇就从重新安装ArchLinux的记录开始。</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published datetime=2026-02-21T00:00:00Z>Feb 21, 2026</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>阅读时长: 9 分钟</time></div></footer></div></header><section class=article-content><p>本系列用于聚合本人安装使用ArchLinux过程中遇到的一些问题。第一篇就从重新安装ArchLinux的记录开始，本人主要的安装过程请参考<a class=link href=https://arch.icekylin.online/ target=_blank rel=noopener>archlinux 简明指南</a>，本文也会以其的指导为基础主要列出一些本人的一些个性化配置。</p><blockquote><p>2026/02/21 更新Gnome安装为wayland。</p></blockquote><h2 id=基础安装>基础安装</h2><ul><li><a class=link href=https://arch.icekylin.online/guide/rookie/basic-install target=_blank rel=noopener>archlinux 基础安装 | archlinux 简明指南</a></li></ul><p>基础安装部分其实没有什么个性化的内容。个人其实认为目前随着Windows的安全机制完善，双系统反而破坏了Windows的一些安全特性，故本人更建议直接全新安装。</p><h3 id=nvme硬盘的先进格式化与4kn模式>Nvme硬盘的先进格式化与4kn模式</h3><p>参考：</p><ul><li><a class=link href=https://wiki.archlinuxcn.org/wiki/%E5%85%88%E8%BF%9B%E6%A0%BC%E5%BC%8F%E5%8C%96 target=_blank rel=noopener>先进格式化 - Arch Linux 中文维基</a></li><li><a class=link href="https://www.zhihu.com/tardis/zm/art/355590811?source_id=1005" target=_blank rel=noopener>教你把 NVMe SSD 切换到原生4K模式 - 知乎</a></li></ul><p>2025年的绝大多数Nvme硬盘和部分企业级机械硬盘已经使用了更先进的原生4K物理分区，但为了保证向下兼容性，几乎全部消费级的盘默认开启的都是模拟远古512b扇区的模式，这样理论上会产生逻辑扇区和物理扇区的对齐问题导致性能损失(不过实际对于消费级的低负载基本无影响)。 出于强迫症，既然正好要格式化硬盘就顺便把这个改了。</p><p>首先查看所有硬盘和分区：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># lsblk --fs
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>NAME   FSTYPE   LABEL       UUID                                 MOUNTPOINT
+</span></span><span class=line><span class=cl>sda
+</span></span><span class=line><span class=cl>├─sda1 vfat                 C4DA-2C4D                            /boot
+</span></span><span class=line><span class=cl>├─sda2 swap                 5b1564b2-2e2c-452c-bcfa-d1f572ae99f2 [SWAP]
+</span></span><span class=line><span class=cl>└─sda3 ext4                 56adc99b-a61e-46af-aab7-a6d07e504652 /
+</span></span></code></pre></td></tr></table></div></div><p>选择需要的硬盘（nvme0n1为例），查找支持的格式化后逻辑块地址大小（Formatted Logical Block Address Size, FLBAS）。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># nvme id-ns -H /dev/nvme0n1 | grep &#34;Relative Performance&#34;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>LBA Format  0 : Metadata Size: 0   bytes - Data Size: 512 bytes - Relative Performance: 0x2 Good (in use)
+</span></span><span class=line><span class=cl>LBA Format  1 : Metadata Size: 0   bytes - Data Size: 4096 bytes - Relative Performance: 0x1 Better
+</span></span></code></pre></td></tr></table></div></div><p>找到可用的LBA Format后使用以下命令格式化并修改逻辑分区大小，其中-l是你选的对应模式：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>nvme format /dev/nvmeXn1 -l 1
+</span></span></code></pre></td></tr></table></div></div><h2 id=显卡驱动与桌面环境>显卡驱动与桌面环境</h2><ul><li><a class=link href=https://arch.icekylin.online/guide/rookie/graphic-driver.html target=_blank rel=noopener>archlinux 显卡驱动 | archlinux 简明指南</a></li><li><a class=link href=https://arch.icekylin.online/guide/rookie/desktop-env-and-app.html target=_blank rel=noopener>桌面环境与常用应用安装 | archlinux 简明指南</a></li></ul><p>这里相比于原教程有比较大的出入，我使用的是Gnome作为默认桌面。Gnome对于高分缩放更加友好的同时界面比较好看，虽然Gnome的大而全完全就在ArchLinux的对立面，但给予用户选择大而全也是一种灵活自由吧。（跑</p><h3 id=软件安装的一些小调整>软件安装的一些小调整</h3><p>我将Aur管理的安装放到前面且改用了Paru，在启用archlinuxcn源后即可：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>sudo pacman -S archlinuxcn-keyring
+</span></span><span class=line><span class=cl>sudo pacman -S paru
+</span></span></code></pre></td></tr></table></div></div><p>再就是中文字体的安装可以调的更前面一点来避免gnome和浏览器出现方框字：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>sudo pacman -S adobe-source-han-serif-cn-fonts wqy-zenhei 
+</span></span><span class=line><span class=cl>sudo pacman -S noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra 
+</span></span></code></pre></td></tr></table></div></div><h3 id=gnome和中文输入法>Gnome和中文输入法</h3><ul><li><a class=link href=https://blog.skyone.dev/2023/archlinux-gnome/ target=_blank rel=noopener>ArchLinux安装GNOME桌面 - Skyone Blog</a></li><li><a class=link href=https://www.jianshu.com/p/9f5710d454b6 target=_blank rel=noopener>ArchLinux-GNOME的安装、配置和美化 - 简书</a></li></ul><p>由于Gnome已经完全转向wayland，所以我们不再安装xorg，按以下命令安装 mesa 和 xwayland 用于兼容旧有的xwindow程序。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>sudo pacman -S mesa xorg-xwayland
+</span></span></code></pre></td></tr></table></div></div><p>安装gnome，其中gnome里面可以全装（你都选gnome了也不会太在乎这些基础功能是否精简干净了吧），但gnome-extra里面有大量没用的游戏、效率工具等内容，可以直接选择不装或者只挑有用的进行安装，一定一定要挑一下别学我直接一口气给我装了十个游戏。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>sudo pacman -S gnome gnome-extra
+</span></span></code></pre></td></tr></table></div></div><p>然后打开gdm就可以显示图形界面了：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>sudo systemctl enable --now gdm
+</span></span></code></pre></td></tr></table></div></div><p>安装完成后若在设置里面没有显示中文请确定按简明教程正确配置<code>/etc/locale.gen</code>后执行：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>sudo locale-gen
+</span></span></code></pre></td></tr></table></div></div><p>然后安装rime-ibus，选择ibus的原因是Gnome的窗口管理器基本和ibus输入引擎深度绑定，与其去折腾fctix的各种奇怪bug不如直接把朙月输入法的引擎引入ibus来的省心。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>sudo pacman -S ibus-rime
+</span></span><span class=line><span class=cl>sudo pacman librime-data-luna-pinyin
+</span></span></code></pre></td></tr></table></div></div><p>Gnome的ibus无法通过正常的<code>ibus-setup</code>里的配置进行添加和编辑，也无法检查常规路径里面大的配置文件，且gnome输入法设置里的设置又少的可怜。以为ibus设置横向选词为例，根据<a class=link href=https://github.com/rime/ibus-rime/issues/52 target=_blank rel=noopener>这个帖子</a>，正确的Gnome配套的ibus配置文件位于:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>~/.config/ibus/rime/build/ibus_rime.yaml
+</span></span></code></pre></td></tr></table></div></div><p>打开这个文件后修改以下选项即可实现横向输入：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>style:
+</span></span><span class=line><span class=cl>   horizontal: true
+</span></span></code></pre></td></tr></table></div></div><h2 id=美化与完善>美化与完善</h2><ul><li><a class=link href=https://arch.icekylin.online/guide/advanced/optional-cfg-1.html target=_blank rel=noopener>可选配置（基础篇） | archlinux 简明指南</a></li></ul><h3 id=语言与地区设置>语言与地区设置</h3><ul><li><a class=link href=https://wiki.archlinuxcn.org/wiki/%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%E6%9C%AC%E5%9C%B0%E5%8C%96 target=_blank rel=noopener>简体中文本地化 - Arch Linux 中文维基</a></li></ul><p>我们按照以上教程先配置一个英文的全局local来防止tty中的中文渲染错误，修改<code> /etc/locale.conf</code>：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>LANG=en_US.UTF-8
+</span></span></code></pre></td></tr></table></div></div><p>然后分别编辑以下文件：</p><ul><li><code>~/.bashrc</code></li><li><code>~/.xinitrc</code></li><li><code>~/.xprofile</code></li></ul><p>添加如下内容：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=k>export</span> <span class=n>LANG</span><span class=o>=</span><span class=n>zh_CN</span><span class=o>.</span><span class=n>UTF</span><span class=o>-</span><span class=mi>8</span>
+</span></span><span class=line><span class=cl><span class=k>export</span> <span class=n>LANGUAGE</span><span class=o>=</span><span class=n>zh_CN</span><span class=p>:</span><span class=n>en_US</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=中文字体完善>中文字体完善</h3><ul><li><a class=link href=https://wiki.archlinuxcn.org/wiki/%E5%AD%97%E4%BD%93%E9%85%8D%E7%BD%AE target=_blank rel=noopener>字体配置 - Arch Linux 中文维基</a></li><li><a class=link href=https://wiki.archlinuxcn.org/wiki/%E5%AD%97%E4%BD%93%E9%85%8D%E7%BD%AE/%E4%B8%AD%E6%96%87 target=_blank rel=noopener>字体配置/中文 - Arch Linux 中文维基</a></li></ul><p>接下来我们修改一下字体的配置，让默认字体更接近Android原生的字体风格。首先下载我们需要的字体，这里等宽字体我选择了新的<a class=link href=https://github.com/subframe7536/Maple-font target=_blank rel=noopener>Maple Mono</a>，其可以将中文设置成拉丁字母双倍宽度来实现中英混合的情况下的等宽，比强行压缩汉字的更纱黑体效果好太多。其中如果maple mono系列如果遇到需要选择的情况请选archlinuxcn源。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>paru -S ttf-roboto noto-fonts noto-fonts-cjk adobe-source-han-sans-cn-fonts adobe-source-han-serif-cn-fonts ttf-dejavu ttf-maplemono-nf-unhinted ttf-maplemono-nf-cn-unhinted
+</span></span></code></pre></td></tr></table></div></div><p>然后我们修改<code>~/.config/fontconfig/fonts.conf</code>，以下是我根据配置建议写的Android字体配置，其中为了美观仍然选择的noto sans ckj sc为中文字体，并改用了maple系为等宽字体，这里也可以选择按上面网址里的配置修复Bug：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span><span class=lnt>140
+</span><span class=lnt>141
+</span><span class=lnt>142
+</span><span class=lnt>143
+</span><span class=lnt>144
+</span><span class=lnt>145
+</span><span class=lnt>146
+</span><span class=lnt>147
+</span><span class=lnt>148
+</span><span class=lnt>149
+</span><span class=lnt>150
+</span><span class=lnt>151
+</span><span class=lnt>152
+</span><span class=lnt>153
+</span><span class=lnt>154
+</span><span class=lnt>155
+</span><span class=lnt>156
+</span><span class=lnt>157
+</span><span class=lnt>158
+</span><span class=lnt>159
+</span><span class=lnt>160
+</span><span class=lnt>161
+</span><span class=lnt>162
+</span><span class=lnt>163
+</span><span class=lnt>164
+</span><span class=lnt>165
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-xml data-lang=xml><span class=line><span class=cl><span class=cp>&lt;?xml version=&#34;1.0&#34;?&gt;</span>
+</span></span><span class=line><span class=cl><span class=cp>&lt;!DOCTYPE fontconfig SYSTEM &#34;fonts.dtd&#34;&gt;</span>
+</span></span><span class=line><span class=cl><span class=nt>&lt;fontconfig&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;its:rules</span> <span class=na>xmlns:its=</span><span class=s>&#34;http://www.w3.org/2005/11/its&#34;</span> <span class=na>version=</span><span class=s>&#34;1.0&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;its:translateRule</span>
+</span></span><span class=line><span class=cl>      <span class=na>translate=</span><span class=s>&#34;no&#34;</span>
+</span></span><span class=line><span class=cl>      <span class=na>selector=</span><span class=s>&#34;/fontconfig/*[not(self::description)]&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>/&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/its:rules&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;description&gt;</span>Android Font Config<span class=nt>&lt;/description&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c>&lt;!-- Font directory list --&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;dir&gt;</span>/usr/share/fonts<span class=nt>&lt;/dir&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;dir&gt;</span>/usr/local/share/fonts<span class=nt>&lt;/dir&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;dir</span> <span class=na>prefix=</span><span class=s>&#34;xdg&#34;</span><span class=nt>&gt;</span>fonts<span class=nt>&lt;/dir&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=c>&lt;!-- the following element will be removed in the future --&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;dir&gt;</span>~/.fonts<span class=nt>&lt;/dir&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c>&lt;!-- 关闭内嵌点阵字体 --&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;match</span> <span class=na>target=</span><span class=s>&#34;font&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;edit</span> <span class=na>name=</span><span class=s>&#34;embeddedbitmap&#34;</span> <span class=na>mode=</span><span class=s>&#34;assign&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;bool&gt;</span>false<span class=nt>&lt;/bool&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/edit&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/match&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c>&lt;!-- 英文默认字体使用 Roboto 和 Noto Serif ,终端使用 Maple Mono NF.。--&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;match&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>qual=</span><span class=s>&#34;any&#34;</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>serif<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;edit</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span> <span class=na>mode=</span><span class=s>&#34;prepend&#34;</span> <span class=na>binding=</span><span class=s>&#34;strong&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>Noto Serif<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/edit&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/match&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;match</span> <span class=na>target=</span><span class=s>&#34;pattern&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>qual=</span><span class=s>&#34;any&#34;</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>sans-serif<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;edit</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span> <span class=na>mode=</span><span class=s>&#34;prepend&#34;</span> <span class=na>binding=</span><span class=s>&#34;strong&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>Roboto<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/edit&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/match&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;match</span> <span class=na>target=</span><span class=s>&#34;pattern&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>qual=</span><span class=s>&#34;any&#34;</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>monospace<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;edit</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span> <span class=na>mode=</span><span class=s>&#34;prepend&#34;</span> <span class=na>binding=</span><span class=s>&#34;strong&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>Maple Mono NF<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/edit&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/match&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c>&lt;!-- 中文默认字体使用　Noto Sans CJK SC ,终端使用 Maple Mono NF CN。--&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;match&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>name=</span><span class=s>&#34;lang&#34;</span> <span class=na>compare=</span><span class=s>&#34;contains&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>zh<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>serif<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;edit</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span> <span class=na>mode=</span><span class=s>&#34;prepend&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>Noto Serif CJK SC<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/edit&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/match&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;match&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>name=</span><span class=s>&#34;lang&#34;</span> <span class=na>compare=</span><span class=s>&#34;contains&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>zh<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>sans-serif<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;edit</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span> <span class=na>mode=</span><span class=s>&#34;prepend&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>Noto Sans CJK SC<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/edit&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/match&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;match&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>name=</span><span class=s>&#34;lang&#34;</span> <span class=na>compare=</span><span class=s>&#34;contains&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>zh<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>monospace<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;edit</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span> <span class=na>mode=</span><span class=s>&#34;prepend&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>Maple Mono NF CN<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/edit&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/match&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c>&lt;!-- Windows &amp; Linux Chinese fonts. --&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=c>&lt;!-- 把所有常见的中文字体映射到思源黑体和思源宋体，这样当这些字体未安装时会使用思源黑体和思源宋体.
+</span></span></span><span class=line><span class=cl><span class=c>解决特定程序指定使用某字体，并且在字体不存在情况下不会使用fallback字体导致中文显示不正常的情况. --&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;match</span> <span class=na>target=</span><span class=s>&#34;pattern&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>qual=</span><span class=s>&#34;any&#34;</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>WenQuanYi Zen Hei<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;edit</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span> <span class=na>mode=</span><span class=s>&#34;assign&#34;</span> <span class=na>binding=</span><span class=s>&#34;same&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>Source Han Sans CN<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/edit&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/match&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;match</span> <span class=na>target=</span><span class=s>&#34;pattern&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>qual=</span><span class=s>&#34;any&#34;</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>WenQuanYi Micro Hei<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;edit</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span> <span class=na>mode=</span><span class=s>&#34;assign&#34;</span> <span class=na>binding=</span><span class=s>&#34;same&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>Source Han Sans CN<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/edit&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/match&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;match</span> <span class=na>target=</span><span class=s>&#34;pattern&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>qual=</span><span class=s>&#34;any&#34;</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>WenQuanYi Micro Hei Light<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;edit</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span> <span class=na>mode=</span><span class=s>&#34;assign&#34;</span> <span class=na>binding=</span><span class=s>&#34;same&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>Source Han Sans CN<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/edit&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/match&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;match</span> <span class=na>target=</span><span class=s>&#34;pattern&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>qual=</span><span class=s>&#34;any&#34;</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>Microsoft YaHei<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;edit</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span> <span class=na>mode=</span><span class=s>&#34;assign&#34;</span> <span class=na>binding=</span><span class=s>&#34;same&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>Source Han Sans CN<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/edit&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/match&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;match</span> <span class=na>target=</span><span class=s>&#34;pattern&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>qual=</span><span class=s>&#34;any&#34;</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>SimHei<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;edit</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span> <span class=na>mode=</span><span class=s>&#34;assign&#34;</span> <span class=na>binding=</span><span class=s>&#34;same&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>Source Han Sans CN<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/edit&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/match&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;match</span> <span class=na>target=</span><span class=s>&#34;pattern&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>qual=</span><span class=s>&#34;any&#34;</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>SimSun<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;edit</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span> <span class=na>mode=</span><span class=s>&#34;assign&#34;</span> <span class=na>binding=</span><span class=s>&#34;same&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>Source Han Serif CN<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/edit&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/match&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;match</span> <span class=na>target=</span><span class=s>&#34;pattern&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;test</span> <span class=na>qual=</span><span class=s>&#34;any&#34;</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>SimSun-18030<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/test&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;edit</span> <span class=na>name=</span><span class=s>&#34;family&#34;</span> <span class=na>mode=</span><span class=s>&#34;assign&#34;</span> <span class=na>binding=</span><span class=s>&#34;same&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;string&gt;</span>Source Han Serif CN<span class=nt>&lt;/string&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/edit&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/match&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c>&lt;!-- Load local system customization file --&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;include</span> <span class=na>ignore_missing=</span><span class=s>&#34;yes&#34;</span><span class=nt>&gt;</span>conf.d<span class=nt>&lt;/include&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=c>&lt;!-- Font cache directory list --&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;cachedir&gt;</span>/var/cache/fontconfig<span class=nt>&lt;/cachedir&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;cachedir</span> <span class=na>prefix=</span><span class=s>&#34;xdg&#34;</span><span class=nt>&gt;</span>fontconfig<span class=nt>&lt;/cachedir&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=c>&lt;!-- the following element will be removed in the future --&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;cachedir&gt;</span>~/.fontconfig<span class=nt>&lt;/cachedir&gt;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;config&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=c>&lt;!-- Rescan configuration every 30 seconds when FcFontSetList is called --&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;rescan&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;int&gt;</span>30<span class=nt>&lt;/int&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/rescan&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/config&gt;</span>
+</span></span><span class=line><span class=cl><span class=nt>&lt;/fontconfig&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=安装雾凇拼音>安装雾凇拼音</h3><ul><li><a class=link href=https://github.com/iDvel/rime-ice#arch-linux target=_blank rel=noopener>Rime-ice配置 - ArchLinux</a></li><li><a class=link href=https://github.com/iDvel/rime-ice#arch-linux target=_blank rel=noopener>Rime 配置文件 - 補靪</a></li></ul><p>雾凇拼音是 Rime 的一份配置仓库，用户需要下载 各平台对应的前端，并将此配置应用到配置目录。 雾凇拼音提供了一套开箱即用的完整配置，包含输入方案（全拼、常见双拼）、长期维护的开源词库及各项扩展功能。</p><p>通过以下命令安装雾凇拼音的文件：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>paru -S rime-ice-git
+</span></span></code></pre></td></tr></table></div></div><p>编辑&rsquo;$HOME/.config/ibus/rime/&lsquo;文件，添加如下内容：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>patch</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c># 仅使用「雾凇拼音」的默认配置，配置此行即可</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>__include</span><span class=p>:</span><span class=w> </span><span class=l>rime_ice_suggestion:/</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c># 以下根据自己所需自行定义，非必须内容，仅做参考。</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c># 针对对应处方的定制条目，请使用 &lt;recipe&gt;.custom.yaml 中配置，例如 rime_ice.custom.yaml</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>__patch</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>key_binder/bindings/+</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=c># 开启逗号句号翻页</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- {<span class=w> </span><span class=nt>when: paging, accept: comma, send</span><span class=p>:</span><span class=w> </span><span class=l>Page_Up }</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- {<span class=w> </span><span class=nt>when: has_menu, accept: period, send</span><span class=p>:</span><span class=w> </span><span class=l>Page_Down }</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>切换输入法到rime，等待重新构建输入方案后就可以使用雾凇拼音了。</p><h3 id=tcp调参>TCP调参</h3><ul><li><a class=link href=https://www.omnitt.com/ target=_blank rel=noopener>TCP 迷之调参 - 智能网络优化工具</a></li></ul><p>估计玩过VPS的都多少了解过TCP调参这个事情吧。虽然大多数在服务器上可以有效提高吞吐量的设置在终端设备上就是浪费内存浪费电，但有些算法类的调整（例如bbr拥塞控制）还是能有效提高设备网络性能的。</p><p>为<code>/etc/sysctl.conf</code>文件添加如下内容，主要是改变队列管理和拥塞控制算法其他都可动可不动：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># --- 笔记本网络与系统优化 ---
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 使用现代队列管理算法，对抗缓冲区膨胀，降低延迟
+</span></span><span class=line><span class=cl>net.core.default_qdisc = cake
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 启用 BBR 拥塞控制算法以提升速度和吞吐量
+</span></span><span class=line><span class=cl>net.ipv4.tcp_congestion_control = bbr
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 启用 TCP Fast Open 减少连接延迟
+</span></span><span class=line><span class=cl>net.ipv4.tcp_fastopen = 3
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 允许重用 TIME_WAIT 状态的连接
+</span></span><span class=line><span class=cl>net.ipv4.tcp_tw_reuse = 1
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 连接空闲后更快地恢复传输速度
+</span></span><span class=line><span class=cl>net.ipv4.tcp_slow_start_after_idle = 0
+</span></span></code></pre></td></tr></table></div></div><h3 id=gnome插件推荐>Gnome插件推荐</h3><p>为了给gnome安装插件，首先需要安装gnome-shell-extensions和gnome-browser-connector，如果仍然无法安装请再安装对应浏览器里的插件。（和其他发行版不同<strong>不需要安装chrome-gnome-shell</strong>）</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>paru -S gnome-shell-extensions gnome-browser-connector
+</span></span></code></pre></td></tr></table></div></div><p>以下是本人在用的一些插件：</p><ul><li><a class=link href=https://extensions.gnome.org/extension/615/appindicator-support/ target=_blank rel=noopener>AppIndicator and KStatusNotifierItem Support </a>：恢复被gnome取消的托盘</li><li><a class=link href=https://extensions.gnome.org/extension/1460/vitals/ target=_blank rel=noopener>Vitals</a>: 清爽的硬件监控</li></ul><h2 id=常用软件>常用软件</h2><ul><li><a class=link href=https://arch.icekylin.online/guide/advanced/system-ctl.html target=_blank rel=noopener>Linux 日常操作与基础知识 | archlinux 简明指南</a></li></ul><h3 id=防火墙>防火墙</h3><p>按照个人使用习惯安装ufw防火墙和其gui版本gufw并启动：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>paru -S ufw gufw
+</span></span><span class=line><span class=cl>sudo systemctl enable --now ufw.service
+</span></span><span class=line><span class=cl>sudo ufw enable
+</span></span></code></pre></td></tr></table></div></div><p>这个防火墙不用我多介绍了吧无论cli还是衍生的gui都是最简单的那一类了。注意放行一些类似LocalSend之类的传入请求即可，大多数时候拒绝入站能根本上解决一些公共网络中的安全问题。</p><h3 id=java环境>Java环境</h3><ul><li><a class=link href=https://wiki.archlinuxcn.org/wiki/Java target=_blank rel=noopener>Java - Arch Linux 中文维基</a></li></ul><p>ArchLinux的Java充分考虑了Java生态碎片化的情况，准备了 java-runtime-common和java-environment-common包作为系统的Java环境管理工具，使得开发者可以在命令行切换目前使用的Java版本。</p><p>我们先安装一个21版本的OpenJDK</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>paru -S jdk21-openjdk
+</span></span></code></pre></td></tr></table></div></div><p>此时可以看到java-runtime-common也被作为依赖安装到了设备上，我们用命令查看一下目前支持的java环境：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># archlinux-java status
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Available Java environments:
+</span></span><span class=line><span class=cl>  java-21-openjdk (default)
+</span></span></code></pre></td></tr></table></div></div><p>可以看到我们所有的java环境和目前启动Java程序所使用的默认Java路径，后续我们只需要用：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>archlinux-java set &lt;JAVA_ENV_NAME&gt;
+</span></span></code></pre></td></tr></table></div></div><p>就可以切换目前使用的Java环境了。</p><h3 id=intellij-idea系ide的安装>intellij-idea系IDE的安装</h3><p>我们可以在AUR里安装几乎全部的jetbrain公司的产品，但是安装后直接点击桌面图标是无法启动的（演示以webstorm为例）：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>paru -S webstorm
+</span></span></code></pre></td></tr></table></div></div><p>此时<strong>在电脑中已有Java环境的情况下</strong>前往安装目录寻找启动脚本(以webstorm为例，目录应该在 /opt/webstorm/bin/webstorm.sh)并执行。该脚本可以在没有jetbarin的jre的情况下用默认Java环境打开对应IDE。</p><p>完成初始化后，我们在主菜单使用<code>Ctrl + Shift + A</code>快捷键搜索<code>选择IDE的启动Java运行时</code>（中文）或者<code>Choose Boot Java Runtime for the IDE</code>（英文），在新建里面随便下载一个（首次安装）/选择上一个IDE已经下载好的路径即可。</p><p><img src=https://img.takuron.com/20250827/b3e0b010d074154b6e4695439b86b3b0.webp loading=lazy alt=选择Java运行环境></p><h3 id=其他常用软件>其他常用软件</h3><ul><li>视频：Vlc播放器 <code>paru -S vlc vlc-plugins-all</code></li><li>图形化文本编辑器：Visual Studio Code <code>paru -S code</code></li><li>办公三件套：LibreOffice <code>paru -S libreoffice-fresh libreoffice-fresh-zh-cn</code> 或者 <code>paru -S libreoffice-still libreoffice-still-zh-cn</code></li><li>录屏/直播：OBS <code>paru -S obs-studio</code></li></ul></section><footer class=article-footer><section class=article-tags><a href=/tags/linux/>Linux</a>
+<a href=/tags/archlinux/>ArchLinux</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article class=has-image><a href=/post/id0034/><div class=article-image><img src=https://img.takuron.com/20250827/fd891f4ceba3bd23434784b7077c9044.webp loading=lazy data-key=id0034 data-hash=https://img.takuron.com/20250827/fd891f4ceba3bd23434784b7077c9044.webp></div><div class=article-details><h2 class=article-title>ArchLinux折腾记录02：使用问题合集</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=takuron/takuron.github.io data-repo-id=R_kgDOOgEzQw data-category=Announcements data-category-id=DIC_kwDOOgEzQ84CphSH data-mapping=pathname data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=light data-lang=en data-loading crossorigin=anonymous async></script><script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"dark")}})()</script><footer class=site-footer><section class=copyright>&copy;
+2017 -
+2026 Takuron</section><section class=powerby><a href=https://www.travellings.cn/go.html target=_blank rel=noopener title=开往-友链接力><img src=https://www.travellings.cn/assets/logo.gif alt=开往-友链接力 width=120></a><br>使用 <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> 构建<br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.34.2>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.c922af694cc257bf1ecc41c0dd7b0430f9114ec280ccf67cd2c6ad55f5316c4e.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
