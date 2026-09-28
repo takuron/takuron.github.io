@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>版本控制 on Takuron</title><link>https://takuron.com/tags/%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6/</link><description>Recent content in 版本控制 on Takuron</description><generator>Hugo -- gohugo.io</generator><language>zh-CN</language><lastBuildDate>Fri, 23 May 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://takuron.com/tags/%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6/index.xml" rel="self" type="application/rss+xml"/><item><title>面向非码农的Git速成教程</title><link>https://takuron.com/post/id0031/</link><pubDate>Fri, 23 May 2025 00:00:00 +0000</pubDate><guid>https://takuron.com/post/id0031/</guid><description>&lt;img src="https://img.takuron.com/20250827/19ef1f788b216385031c72e006deb649.webp" alt="Featured image of post 面向非码农的Git速成教程" /&gt;&lt;p&gt;随着科学计算和机器学习的发展，编程和计算机软件使用已经几乎融入了几乎每一个理工商医科学生的学习中。这些软件给同时做过软件开发的跨专业人才来说，这种体系确实成功使用软件工程的轮子为他们解决了大问题，但这可苦了使用这些工具的学生。每当看他们用着记事本复制粘贴C某DN的代码后用微信互相发送的时候，我真的觉得应当让他们感受并掌握早已体系化工业化的软件工程的基础工具了。&lt;/p&gt;
+&lt;p&gt;本文将基于Github只讲最最最基础的Git使用方法，目标是让非程序员快速上手这一套版本控制系统的基础功能改善编码体验，如有错漏欢迎指出。本文注重基础概念的讲解，但和其他教程不同的是虽然也会给出程序员常用的命令，&lt;strong&gt;我本人非常鼓励使用者寻找一个合适的图形化工具进行Git操作&lt;/strong&gt;，本文将以Github Desktop为例进行演示。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;但要注意有些客户端会简化点命令行的部分概念，例如本教程的示例客户端就简化掉了add操作，所以还是烦请看一下理论基础以真正掌握基本的概念。（早知道用idea系自带的那个了，用pycharm的人还多）&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id="写在前面"&gt;写在前面
+&lt;/h2&gt;&lt;h3 id="git和github"&gt;Git和Github？
+&lt;/h3&gt;&lt;p&gt;虽然现在具有私服的游戏越来越少，但我相信你多少见过类似Minecraft、CSGO、方舟生存进化这种具有私服的游戏，你可以单机玩、连官服玩、或者加入你朋友创建的服务器，而Git也是类似的一个软件。Git本身是一个&lt;strong&gt;本地的工具软件&lt;/strong&gt;，就像你玩过的那些可以单机可以联机的游戏一样，他可以不需要依赖网络或者特定的服务器来独立运行；而Github则是一个&lt;strong&gt;代码托管平台&lt;/strong&gt;，相当于这些游戏里体量大的服务器或者官服，大多数情况下你会用他来存放你的仓库，但&lt;strong&gt;没有Github你也可以将你的代码仓库放在本地或者其他服务器（Gitlab/Gitee等）上面&lt;/strong&gt;。并且软件本身的&lt;strong&gt;基础操作是相同的&lt;/strong&gt;，就像你大多数时候不需要因为换了游戏服务器而需要学习新的游戏操作方法一样。&lt;/p&gt;
+&lt;h3 id="注册github"&gt;注册Github
+&lt;/h3&gt;&lt;p&gt;如果你身处中国大陆地区请准备好魔法上网的工具，虽然理论没有被彻底屏蔽但考虑现在的网络质量请保证注册过程中时刻具有连接国外网站的能力。&lt;/p&gt;
+&lt;p&gt;进入Github官网后直接点击右上角的Sign up填写信息即可，请记住你的密码，后面要用。&lt;/p&gt;
+&lt;h2 id="版本控制与git的思路"&gt;版本控制与Git的思路
+&lt;/h2&gt;&lt;h3 id="什么是版本控制"&gt;什么是版本控制
+&lt;/h3&gt;&lt;p&gt;大多数人无法一次性解决一个终极问题，大到各种科学理论、工程项目、日常家务这些工作大家大多数时候都遵循的是执行-改进的流程,，这个过程涉及大量的更改尝试甚至多人合作的拆解和合并。这时你的每一个阶段都会有一个或好或坏的阶段性成果，这就是我们说的广义的版本，而版本控制就是如何管理这些阶段性成果的工程实践，例如以下梗图就是一个最失败的版本控制：&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/id0031/24f60c954cca17f8e9436e0cd598bd2d_MD5-tuya.webp"
+loading="lazy"
+alt="版本地狱"
+&gt;&lt;/p&gt;
+&lt;p&gt;版本控制的思维不止仅限于软件工程和Git、如何做好一个项目的版本控制是管理&lt;strong&gt;任何项目&lt;/strong&gt;的关键。一个好的版本标注、存储、同步、分叉会让你的项目管理事半功倍，而Git则是一个很优秀的解决方案供大家参考。&lt;/p&gt;
+&lt;h3 id="git的诞生和思路"&gt;Git的诞生和思路
+&lt;/h3&gt;&lt;p&gt;2005年，Linux系统使用的版本控制工具BitKeeper突然转向收费，在市场上没有更加合适的版本工具的情况下Linus Torvalds（Linux之父）用10天时间从零手搓了Git，其核心思路包括：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;分布式架构&lt;/strong&gt;：任何协作者本地都有一个完整的全量仓库，虽然设计了完整的向线上提交的系统，但你&lt;strong&gt;总是可以在本地获得整个仓库完整的记录&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;基于指针的全量快照&lt;/strong&gt;：Git总是能直接保持任何提交时刻的&lt;strong&gt;完整状态&lt;/strong&gt;，就像照片一样，拍下即定格。你任何提交时候每一行代码和文件的完整内容、这些内容的创建者和他们的邮箱&lt;strong&gt;随时都可以查到&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;任意的版本标注、管理和分叉&lt;/strong&gt;：有大量的工具可以帮助你管理这些快照之间的状态，你可以&lt;strong&gt;随时将你的代码返回任意这些快照的时候&lt;/strong&gt;。同时这些照片绘相当于自带修图，类似于画画一样，你可以随时重新编辑其中的一部分元素或者合并两幅画里面的小饰品，或者为其中的人物画一个新的表情，你可以像拼积木一样随时装上或者拆除一部分而不影响其他任何东西。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="你需要知道的概念"&gt;你需要知道的概念
+&lt;/h2&gt;&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/id0031/537f830fff73c137931cbd2cd7760950_MD5-tuya.webp"
+loading="lazy"
+alt="本节一图流"
+&gt;&lt;/p&gt;
+&lt;h3 id="远程仓库本地仓库暂存区与工作区"&gt;远程仓库、本地仓库、暂存区与工作区
+&lt;/h3&gt;&lt;p&gt;为了实现版本控制，git对处于不同阶段的代码准备了不同的存储状态。首先版本控制本身不应该干扰任何实际进行的编码，保证能够应对任何项目结构（也就是你存储代码的整个文件夹），这个不干扰你正常编码的代码存储区域叫&lt;strong&gt;工作区（Working Directory）&lt;/strong&gt;。不过并不是每个文件都需要放在git仓库里存储，就像你会把要发送的快递放在门口但快递员不能直接抓起你家鞋柜就跑一样，你需要告诉快递员什么是需要发走的，这就是提交到&lt;strong&gt;暂存区（Staging Area）&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;接着就是和本地仓库的交互，&lt;strong&gt;本地仓库（Repository）&lt;/strong&gt; 正如它的名字和我们前面所讲的概念，它存储着历史以来这个项目里所有代码修改的历史且不可随意变更修改删除，你只能向其提交和获取代码（这两个操作本身后面再讲）而不能直接对其修改，就像现实的物流仓库出入东西都会被登记一样。&lt;strong&gt;远程仓库（Reomte Repository）&lt;/strong&gt; 则是为云端存储和多人协作设计的，每个协作开发的人都可以与远程仓库进行交互来保证自己的代码最终存储并可以随着他人的同步最终进入别人的工作区来实现协同开发。&lt;/p&gt;
+&lt;h3 id="addcommit和push"&gt;Add、Commit和Push
+&lt;/h3&gt;&lt;p&gt;为了让你写的代码在上面几个区域之间流动我们需要定义一些操作，首先你需要让你新建的文件被包含在git的管理中，我们叫这个操作为&lt;strong&gt;add&lt;/strong&gt;。例如在大多数情况下我们会用如下命令直接一次性添加所有文件到暂存区中：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git add .
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;如果你的项目有一些编辑过程和结果文件不需要被添加到仓库中，我们可以使用.gitignore配置文件来直接自动忽略这些，具体会放在实际操作部分讲解。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;为了把暂存区的代码归入仓库中，我们需要将本次的修改打包提交。就像快递员相比于处理你箱子里的东西只会看你的快递单一样，你需要将目前为止的修改装一个盒子并给出一个相当于快递单的说明，这个过程我们叫做&lt;strong&gt;commit&lt;/strong&gt;。&lt;strong&gt;我们的代码仓库就是由一次次commit组合而来的&lt;/strong&gt;，编写清晰、规范的&lt;code&gt;commit message&lt;/code&gt;（提交说明）至关重要，因为它能帮助你和协作者在未来快速理解每次变更的目的和内容。最简单的commit命令为：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git commit -m &amp;#34;提交说明&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;当然你也可以不在这里写说明，前提是你知道并且会使用你命令行的默认编辑器。但是如果你知道我在说什么并且会用vi/vim大概率是不需要看这个教程的。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;当然，你也可以抛弃已经修改的代码来快速回到上一次commit保存的状态，一般我们会使用reset回撤已经被add的文件、checkout回撤暂未增加的文件。&lt;/p&gt;
+&lt;p&gt;最后是同步本地和远程仓库的操作，将目前本地增加的更改提交到远程仓库的方法叫&lt;strong&gt;push&lt;/strong&gt;，将已经提交到其他仓库的已经打包完成的内容从远程仓库同步下来的方法叫&lt;strong&gt;pull&lt;/strong&gt;。这些方法足够让你将你已经写完的代码放在云端储存和开源共享。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在实际多人协同开发中会遇到两个人或者分支同时对一个文件进行修改的情况而产生&lt;strong&gt;冲突（Conflict）&lt;/strong&gt;，本教程作为最简入门不会专门讲解冲突相关，这部分内容等你用熟了自己就会处理了。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id="时间线和分支"&gt;时间线和分支
+&lt;/h3&gt;&lt;p&gt;前面我们提过了仓库是由一个个快照（不同时间项目文件定格的状态）组成的，然后知道了这个快照本身和建立的方式叫commit。就和电影里面的镜头一样，这些commit会根据时间排列起来（在暂时不考虑分支的情况下）形成一条直线，这就是时间线。每一个项目无论如何都会有一条主线分支（一般叫做master/main），你所做的就是随着时间可开发的进行推进这条线并且留下开发重要节点的记录。&lt;/p&gt;
+&lt;p&gt;为了适应更加复杂的软件工程的情况，Git还提出了&lt;strong&gt;分支（Branch）&lt;/strong&gt; 的概念。想象这样一种情况，你开始了一个新的大版本的开发，代码改到一半旧的版本出现了重大问题需要立即修复，但你的新功能代码都写了一大片了。或者你需要做一些实验性功能，但不希望很早就推送给正式用户，包括多人协作的时候有的时候并不是希望及时同步所有其他人开发的代码。这时候你就可以单独为自己新建一个时间线来专注于你新的功能的处理，创建其他分支的方法我们叫&lt;strong&gt;分叉（Fork）&lt;/strong&gt;，他会基于你现在的分支状态分出一个独立的新时间线供你处理，就像Galgame遇到对话选项一样。当你分支出来的东西确定无误要加入主线的时候的操作我们叫做&lt;strong&gt;合并（Merge）&lt;/strong&gt;。&lt;/p&gt;
+&lt;h3 id="其他你遇得到的操作"&gt;其他你遇得到的操作
+&lt;/h3&gt;&lt;p&gt;并非所有的仓库都是从零搭建起来的，你有的时候需要把目前仓库的状态从远端完全拉取，这个过程叫做&lt;strong&gt;克隆（Clone）&lt;/strong&gt;，克隆会在本地完全重新建立一个与目前远端仓库的状态一模一样的本地仓库和暂存区方便你直接开始代码。&lt;/p&gt;
+&lt;h2 id="实际操作"&gt;实际操作
+&lt;/h2&gt;&lt;h3 id="第一次commit"&gt;第一次commit
+&lt;/h3&gt;&lt;p&gt;这里以以Github Desktop为例示范如何从零开始建立一个自己的仓库和复制别人的仓库，请确保你已经处在魔法上网的状态下下载并登录Github Desktop，登录成功后会看到你账号里所有仓库（你可能什么都没有）。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/id0031/146eee0c413c8bbd734f621689696752_MD5-tuya.webp"
+loading="lazy"
+alt="146eee0c413c8bbd734f621689696752_MD5"
+&gt;&lt;/p&gt;
+&lt;p&gt;登录好后让我们进入网页端，点击账号旁边的加号，new repository。大部分选项都已经自带/附带了解释，这里主要说一下最下面三个选项的用途。第一个是是否要用一个README.md的文件来初始化你的仓库，相当于GitHub帮你进行一次基础的文件创建和提交来初始化整个仓库。请在这里&lt;strong&gt;选上&lt;/strong&gt;可以偷懒跳过自己创建提交git仓库的过程，并且这个文件的内容会显示在你仓库的首页来作为给别人公开预览你仓库的说明书。第二个是是否要（根据模板）创建一个gitignore文件，这里你可以搜索一下你的项目对应的名称，根据上文根据这个模板可以保证大多数非源代码的内容被上传到git来节约空间，根据你的项目实际情况选择。最后一个是你希望使用的开源协议，如果选择会根据你选择的协议模板自动创建一个LICENSE文件来使用对应的开源协议，这个内容不在今天的讨论范围如有兴趣可以自行研究。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/id0031/09b52d5e61a2662ecd877b989b4289d3_MD5-tuya.webp"
+loading="lazy"
+alt="09b52d5e61a2662ecd877b989b4289d3_MD5"
+&gt;
+&lt;img src="https://img.takuron.com/blogpost/id0031/a0a5695ad89b3e95f1f591ce17321cce_MD5-tuya.webp"
+loading="lazy"
+alt="a0a5695ad89b3e95f1f591ce17321cce_MD5"
+&gt;&lt;/p&gt;
+&lt;p&gt;这里过一会儿项目创建好后就可以在网页看到你的项目git链接，刷新客户端也可以在客户端内看到了。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/id0031/04e1e381e60ed836a0effffaa13e7dcb_MD5-tuya.webp"
+loading="lazy"
+alt="04e1e381e60ed836a0effffaa13e7dcb_MD5"
+&gt;
+&lt;img src="https://img.takuron.com/blogpost/id0031/4b991117f24b3042524085b7827b6502_MD5-tuya.webp"
+loading="lazy"
+alt="146eee0c413c8bbd734f621689696752_MD5"
+&gt;&lt;/p&gt;
+&lt;p&gt;接下来我们选择Clone这个项目，客户端会自动填写我们上面网页获取到的Git仓库链接并在你选择克隆目标位置后开始克隆文件，如果是cli/其他客户端你需要将这个链接提交给给软件来实现克隆，克隆成功后即可进入主界面。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/id0031/2375b2e38b955e5189c75e3279b526e6_MD5-tuya.webp"
+loading="lazy"
+alt="2375b2e38b955e5189c75e3279b526e6_MD5"
+&gt;&lt;/p&gt;
+&lt;p&gt;这个界面主要需要关注的只有上面的三个选项和侧边栏的修改和提交。上面三个按钮的作用分别是切换目前的仓库、切换分支（初步操作暂时不会涉及）和与远程同步。而侧边栏的change则是可以显示你目前工作区已经进行的修改来方便你提交/回滚。这里我们先创建一个文件，可以看到我们创建的文件已经自动进入了暂存区并且等待我们提交，&lt;strong&gt;注意这里Github Desktop简化掉了add操作，cli或者其他可视化客户端请先将文件add到暂存区&lt;/strong&gt;。我们为这次提交写一下summary来概括一下这次修改的内容然后commit到main分支。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/id0031/695c99771da47d730c934aedac9169bf_MD5-tuya.webp"
+loading="lazy"
+alt="695c99771da47d730c934aedac9169bf_MD5"
+&gt;
+&lt;img src="https://img.takuron.com/blogpost/id0031/e80326417a812e90cda629c4afc9b5c1_MD5-tuya.webp"
+loading="lazy"
+alt="e80326417a812e90cda629c4afc9b5c1_MD5"
+&gt;&lt;/p&gt;
+&lt;p&gt;然后上方第三个按钮就变成了push来提醒你将目前本地仓库的内容提交到网上，我们可以攒几个commit再推送或者直接推送，我们直接推送然后到网页查看就可以看到我们新提交的文件了。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/id0031/161ca8cf074cbf150ab320b87c3d7cff_MD5-tuya.webp"
+loading="lazy"
+alt="161ca8cf074cbf150ab320b87c3d7cff_MD5"
+&gt;
+&lt;img src="https://img.takuron.com/blogpost/id0031/37559f048bbce015c3faf33bcb884b30_MD5-tuya.webp"
+loading="lazy"
+alt="37559f048bbce015c3faf33bcb884b30_MD5"
+&gt;&lt;/p&gt;
+&lt;h3 id="修改和回撤"&gt;修改和回撤
+&lt;/h3&gt;&lt;p&gt;接下来我们对文件进行一次修改并假设修改错误的情况下回撤目前的修改。我们先编辑一下README来制造修改。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/id0031/5656591e7b067d8e01bd8959c0ad596b_MD5-tuya.webp"
+loading="lazy"
+alt="5656591e7b067d8e01bd8959c0ad596b_MD5"
+&gt;&lt;/p&gt;
+&lt;p&gt;回到Github Desktop，我们可以发现暂存区的修改已经显示，你可以按照上一节的方法再次提交，但这次我们选择右键，discard change并确认。这样的话暂存区的内容就会被丢弃，指定的文件就会回到你上一次commit时候的状态。这对你修改现有内容结果导致无法恢复的严重错误有非常大的帮助。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/id0031/3a7c13fd3499d1f0e88dd3b95995fda0_MD5-tuya.webp"
+loading="lazy"
+alt="3a7c13fd3499d1f0e88dd3b95995fda0_MD5"
+&gt;&lt;/p&gt;
+&lt;h3 id="拉取"&gt;拉取
+&lt;/h3&gt;&lt;p&gt;我们再模拟多台设备/别人一起开发的情况，这里我们现在网页对文件进行一下修改（网页上对文件的修改也是一次commit）。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/id0031/7a2837ad6b5f74f7fa11ca42c5a9b129_MD5-tuya.webp"
+loading="lazy"
+alt="7a2837ad6b5f74f7fa11ca42c5a9b129_MD5"
+&gt;&lt;/p&gt;
+&lt;p&gt;此时Github中的仓库应当已经被修改但本地并未跟进，此时你可以回到客户端，选择Fetch origin。此时GitHub Desktop就会检查到可以从远程仓库拉取修改，对应按钮变成Pull，选择就可以把你在线进行的修改拉取到本地了。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/id0031/69e3ca4b4383bf58b7feb3ff6ef159ae_MD5-tuya.webp"
+loading="lazy"
+alt="69e3ca4b4383bf58b7feb3ff6ef159ae_MD5"
+&gt;&lt;/p&gt;
+&lt;h3 id="分支别人的仓库和pull-request"&gt;分支别人的仓库和pull request
+&lt;/h3&gt;&lt;p&gt;最后讲讲如何快速分（chao）支（xi）别人的代码，对于其他公开的仓库如果你需要学习研究他们的代码你可以通过点击左上角的Fork来使用Github的Fork功能，填写基础信息后等待一段时间你就有了一个以你为管理员的新代码仓库了，你可以克隆下来任意使用修改。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/id0031/2434e0b63f150245e53b9db1e16cb46e_MD5-tuya.webp"
+loading="lazy"
+alt="2434e0b63f150245e53b9db1e16cb46e_MD5"
+&gt;
+&lt;img src="https://img.takuron.com/blogpost/id0031/08cc37cf9d35ba8a0fcfd5246c74de9b_MD5-tuya.webp"
+loading="lazy"
+alt="08cc37cf9d35ba8a0fcfd5246c74de9b_MD5"
+&gt;
+&lt;img src="https://img.takuron.com/blogpost/id0031/48770d7fc5c7d3ffd0deb368135e5369_MD5-tuya.webp"
+loading="lazy"
+alt="48770d7fc5c7d3ffd0deb368135e5369_MD5"
+&gt;&lt;/p&gt;
+&lt;p&gt;如果你觉得你的修改很好想提交给原作者怎么办呢，你可以在把修改提交到自己仓库后选择contribute中的open pull request，填写好说明就可以申请将你的修改并入原仓库了。&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://img.takuron.com/blogpost/id0031/544c334630fa0b8fe819704bc144278a_MD5-tuya.webp"
+loading="lazy"
+alt="544c334630fa0b8fe819704bc144278a_MD5"
+&gt;&lt;/p&gt;
+&lt;h2 id="总结"&gt;总结
+&lt;/h2&gt;&lt;p&gt;恭喜你！通过阅读本文，你已经了解了Git和Github的核心概念，并通过Github Desktop实际操作了版本控制的基本流程，包括创建仓库、提交更改、同步远程、回撤修改、复刻他人仓库以及发起Pull Request。记住，版本控制不仅仅是程序员的专属技能，它更是一种高效管理项目、追踪历史、促进协作的思维方式，无论你的专业背景如何，掌握它都将为你的学习和研究带来便利。&lt;/p&gt;</description></item></channel></rss>
